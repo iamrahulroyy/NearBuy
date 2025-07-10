@@ -40,71 +40,18 @@ This backend is designed with extensibility, scalability, and modularity in mind
 
 NEARBUY/
 ├── app/
-│   ├── __init__.py
-│   ├── main.py                     # FastAPI app, routers, middleware
-
-│   ├── api/                        # All route logic, organized by version
-│   │   ├── __init__.py
-│   │   ├── v1/
-│   │   │   ├── __init__.py
-│   │   │   ├── endpoints/
-│   │   │   │   ├── auth/
-│   │   │   │   │   ├── login.py    # /auth/login
-│   │   │   │   │   ├── register.py # /auth/register
-│   │   │   │   │   ├── logout.py   # /auth/logout
-│   │   │   │   ├── users.py        # general user info
-│   │   │   │   ├── shops.py        # create, get, update shop
-│   │   │   │   ├── items.py        # item CRUD
-│   │   │   │   ├── inventory.py    # shop's stock management
-│   │   │   │   ├── search.py       # /search endpoint
-│   │   │   │   └── status.py       # toggle shop open/closed
-
-│   ├── core/                       # App-level core logic/config
-│   │   ├── config.py               # .env parser, settings
-│   │   ├── security.py             # password hashing, auth utils
-│   │   ├── session.py              # cookie session manager
-│   │   └── dependencies.py         # Depends() logic extract
-
-│   ├── db/
-│   │   ├── base.py                 # for Alembic + Base metadata
-│   │   ├── session.py              # SQLAlchemy session connection
-│   │   ├── models/
-│   │   │   ├── user.py
-│   │   │   ├── shop.py
-│   │   │   ├── item.py
-│   │   │   ├── inventory.py
-│   │   └── schemas/
-│   │       ├── user.py
-│   │       ├── shop.py
-│   │       ├── item.py
-│   │       ├── inventory.py
-
-│   ├── services/
-│   │   ├── auth_service.py         # login, register logic
-│   │   ├── shop_service.py         # create/update/fetch shop logic
-│   │   ├── item_service.py         # item creation/fetch
-│   │   ├── inventory_service.py    # add/modify quantity
-│   │   └── search_service.py       # PostGIS search logic
-
-│   ├── utils/
-│   │   ├── geo.py                  # Haversine, PostGIS helpers
-│   │   └── validators.py           # item/lat-lon validation, etc.
-
-│   └── tests/                      # Unit & integration tests
-│       ├── unit/
-│       ├── integration/
-│       └── factories/              # test data factories
-
-├── scripts/
-│   ├── seed_data.py                # dummy data for shops, items, inventory
-│   ├── test_geo_queries.py         # spatial query tester
-
-├── alembic/                        # DB migrations
+│ ├── api/ # All API endpoints (versioned, modular)
+│ ├── core/ # Settings, session, and core logic
+│ ├── db/ # DB models, schemas, and SQLAlchemy session
+│ ├── services/ # Business logic for each domain
+│ ├── utils/ # Helper functions (geo, validation)
+│ └── tests/ # Unit & integration tests
+├── scripts/ # Seeders, spatial test scripts
+├── alembic/ # DB migrations
+├── docker-compose.yml # Dev stack (FastAPI + PostGIS)
 ├── Dockerfile
-├── docker-compose.yml             # Postgres + FastAPI dev env
-├── .env                            # secrets and config
+├── .env # App config
 └── README.md
-
 
 
 ---
