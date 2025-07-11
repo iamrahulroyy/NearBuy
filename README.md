@@ -98,7 +98,7 @@ docker-compose exec backend pytest
 Pull requests and ideas welcome! Please keep contributions modular and follow naming/style conventions already established in the repo.
 
 📜 License
-MIT © Rahul Roy
+MIT ©Rahul Roy
 
 🙏 Acknowledgements
 FastAPI
