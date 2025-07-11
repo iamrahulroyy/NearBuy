@@ -1,0 +1,6 @@
+sqlmodel psycopg[binary]
+sqlmodel psycopg[binary] python-dotenv
+fastapi
+uvicorn
+psycopg2
+geoalchemy2
