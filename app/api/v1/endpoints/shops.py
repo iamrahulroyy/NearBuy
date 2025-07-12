@@ -6,10 +6,10 @@ from app.db.session import get_session
 from app.db.models.shop import Shop
 from app.db.schemas.shop import ShopCreate, ShopRead, ShopUpdate
 
-router = APIRouter(prefix="/shops", tags=["Shops"])
+shop_router = APIRouter(prefix="/shops", tags=["Shops"])
 
 
-@router.post("/", response_model=ShopRead)
+@shop_router.post("/", response_model=ShopRead)
 def create_shop(shop: ShopCreate, session: Session = Depends(get_session)):
     db_shop = Shop.model_validate(shop)
     session.add(db_shop)
@@ -18,13 +18,13 @@ def create_shop(shop: ShopCreate, session: Session = Depends(get_session)):
     return db_shop
 
 
-@router.get("/", response_model=List[ShopRead])
+@shop_router.get("/", response_model=List[ShopRead])
 def get_all_shops(session: Session = Depends(get_session)):
     shops = session.exec(select(Shop)).all()
     return shops
 
 
-@router.get("/nearby", response_model=List[ShopRead])
+@shop_router.get("/nearby", response_model=List[ShopRead])
 def get_nearby_shops(
     latitude: float = Query(...),
     longitude: float = Query(...),
@@ -43,7 +43,7 @@ def get_nearby_shops(
     return result.all()
 
 
-@router.get("/{shop_id}", response_model=ShopRead)
+@shop_router.get("/{shop_id}", response_model=ShopRead)
 def get_shop(shop_id: int, session: Session = Depends(get_session)):
     shop = session.get(Shop, shop_id)
     if not shop:
@@ -51,7 +51,7 @@ def get_shop(shop_id: int, session: Session = Depends(get_session)):
     return shop
 
 
-@router.put("/{shop_id}", response_model=ShopRead)
+@shop_router.put("/{shop_id}", response_model=ShopRead)
 def update_shop(
     shop_id: int,
     shop_data: ShopUpdate,
@@ -67,7 +67,7 @@ def update_shop(
     return shop
 
 
-@router.delete("/{shop_id}")
+@shop_router.delete("/{shop_id}")
 def delete_shop(shop_id: int, session: Session = Depends(get_session)):
     shop = session.get(Shop, shop_id)
     if not shop:

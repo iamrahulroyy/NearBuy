@@ -2,11 +2,12 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from sqlmodel import SQLModel
 from app.db.session import engine
-from app.db.models.user import User
-from app.db.models.shop import Shop
-from app.db.models.item import Item
-from app.db.models.inventory import Inventory
-
+from app.api.v1.endpoints.users import user_router 
+from app.api.v1.endpoints.shops import shop_router 
+from app.api.v1.endpoints.items import item_router 
+from app.api.v1.endpoints.inventory import inventory_router 
+from app.api.v1.endpoints.search import search_router 
+from app.api.v1.endpoints.status import status_router 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -15,6 +16,13 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+app.include_router(user_router)
+app.include_router(shop_router)
+app.include_router(item_router)
+app.include_router(inventory_router)
+app.include_router(search_router)
+app.include_router(status_router)
 
 
 @app.get("/")

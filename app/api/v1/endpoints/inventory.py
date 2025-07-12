@@ -7,10 +7,10 @@ from app.db.models.shop import Shop
 from app.db.models.item import Item
 from app.db.schemas.inventory import InventoryCreate, InventoryRead, InventoryUpdate
 
-router = APIRouter(prefix="/inventory", tags=["Inventory"])
+inventory_router = APIRouter(prefix="/inventory", tags=["Inventory"])
 
 
-@router.post("/", response_model=InventoryRead)
+@inventory_router.post("/", response_model=InventoryRead)
 def add_inventory(entry: InventoryCreate, session: Session = Depends(get_session)):
     shop = session.get(Shop, entry.shop_id)
     item = session.get(Item, entry.item_id)
@@ -28,12 +28,12 @@ def add_inventory(entry: InventoryCreate, session: Session = Depends(get_session
     return inventory
 
 
-@router.get("/", response_model=List[InventoryRead])
+@inventory_router.get("/", response_model=List[InventoryRead])
 def get_all_inventory(session: Session = Depends(get_session)):
     return session.exec(select(Inventory)).all()
 
 
-@router.put("/", response_model=InventoryRead)
+@inventory_router.put("/", response_model=InventoryRead)
 def update_inventory(entry: InventoryUpdate, session: Session = Depends(get_session)):
     inventory = session.get(Inventory, (entry.shop_id, entry.item_id))
     if not inventory:
@@ -45,7 +45,7 @@ def update_inventory(entry: InventoryUpdate, session: Session = Depends(get_sess
     return inventory
 
 
-@router.delete("/{shop_id}/{item_id}")
+@inventory_router.delete("/{shop_id}/{item_id}")
 def delete_inventory(shop_id: int, item_id: int, session: Session = Depends(get_session)):
     inventory = session.get(Inventory, (shop_id, item_id))
     if not inventory:

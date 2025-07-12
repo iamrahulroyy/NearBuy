@@ -7,10 +7,10 @@ from app.db.models.item import Item
 from app.db.models.shop import Shop
 from app.db.schemas.inventory import InventoryRead
 
-router = APIRouter(prefix="/search", tags=["Search"])
+search_router = APIRouter(prefix="/search", tags=["Search"])
 
 
-@router.get("/", response_model=List[InventoryRead])
+@search_router.get("/", response_model=List[InventoryRead])
 def search_inventory(
     item_name: str = Query(..., min_length=1),
     session: Session = Depends(get_session)

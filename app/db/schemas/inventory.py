@@ -11,7 +11,7 @@ class InventoryCreate(InventoryBase):
 
 class InventoryRead(InventoryBase):
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class InventoryUpdate(BaseModel):
     shop_id: int

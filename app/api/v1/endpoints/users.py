@@ -6,9 +6,9 @@ from app.db.schemas.user import UserCreate, UserRead
 from uuid import uuid4
 import bcrypt
 
-router = APIRouter(prefix="/users", tags=["Users"])
+user_router = APIRouter(prefix="/users", tags=["Users"])
 
-@router.post("/signup", response_model=UserRead, status_code=status.HTTP_201_CREATED)
+@user_router.post("/signup", response_model=UserRead, status_code=status.HTTP_201_CREATED)
 def signup(user: UserCreate, session: Session = Depends(get_session)):
     existing_user = session.exec(select(User).where(User.email == user.email)).first()
     if existing_user:
@@ -21,7 +21,7 @@ def signup(user: UserCreate, session: Session = Depends(get_session)):
     session.refresh(db_user)
     return db_user
 
-@router.post("/login")
+@user_router.post("/login")
 def login(user: UserCreate, session: Session = Depends(get_session)):
     db_user = session.exec(select(User).where(User.email == user.email)).first()
     if not db_user or not bcrypt.checkpw(user.password.encode("utf-8"), db_user.password.encode("utf-8")):

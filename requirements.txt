@@ -5,3 +5,4 @@ uvicorn
 psycopg2
 geoalchemy2
 bcrypt
+pydantic[email]
