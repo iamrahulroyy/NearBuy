@@ -1,7 +1,12 @@
+from typing import Optional
 from pydantic import BaseModel
 
 class ItemBase(BaseModel):
-    name: str
+    itemName: str
+    price: float
+    description: Optional[str] = None
+    note: Optional[str] = None
+
 
 class ItemCreate(ItemBase):
     pass
@@ -12,5 +17,8 @@ class ItemRead(ItemBase):
     class Config:
         from_attributes = True
 
-class ItemUpdate(ItemBase):
-    pass
+class ItemUpdate(BaseModel):
+    itemName: Optional[str] = None
+    price: Optional[float] = None
+    description: Optional[str] = None
+    note: Optional[str] = None

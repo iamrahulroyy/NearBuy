@@ -6,9 +6,14 @@ from typing import Optional
 class UserRole(str, Enum):
     USER = "USER"
     OWNER = "OWNER"
+    STATE_CONTRIBUTER = "STATE_CONTRIBUTER"
+    ADMIN = "ADMIN"
+    SUPER_ADMIN = "SUPER_ADMIN"
+    
 
 class UserBase(BaseModel):
     email: EmailStr
+    fullName: Optional[str] = None
     role: UserRole
 
 class UserCreate(UserBase):
@@ -20,3 +25,8 @@ class UserRead(UserBase):
 
     class Config:
         from_attributes = True
+
+class UserUpdate(BaseModel):
+    name: Optional[str] = None
+    password: Optional[str] = None
+    role: Optional[UserRole] = None
