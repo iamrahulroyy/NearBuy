@@ -3,30 +3,31 @@ from uuid import UUID
 from enum import Enum
 from typing import Optional
 
-class UserRole(str, Enum):
-    USER = "USER"
-    OWNER = "OWNER"
-    STATE_CONTRIBUTER = "STATE_CONTRIBUTER"
-    ADMIN = "ADMIN"
-    SUPER_ADMIN = "SUPER_ADMIN"
-    
+from app.db.models.user import UserRole
 
-class UserBase(BaseModel):
-    email: EmailStr
-    fullName: Optional[str] = None
-    role: UserRole
 
-class UserCreate(UserBase):
-    password: str
+class Register_User(BaseModel):
+    fullName: str = "test"
+    email: EmailStr = "test@example.com"
+    password: str = "test1234"
+    role: UserRole = UserRole.USER
 
-class UserRead(UserBase):
-    id: UUID
-    created_at: Optional[str]
+class Register_Vendor(BaseModel):
+    fullName: str = "test vendor"
+    shopName: str = "test shop"
+    address: str = "test address, sector V"
+    contact: Optional[str] = "test contact"
+    email: Optional[EmailStr] = "test@example.com"
+    password: str = "test1234"
+    role: UserRole = UserRole.VENDOR
 
-    class Config:
-        from_attributes = True
+class Register_STATE_CONTRIBUTER(BaseModel):
+    fullName: str = "test contributor"
+    email: EmailStr = "test_contributor@example.com"
+    password: str = "test1234"
+    role: UserRole = UserRole.STATE_CONTRIBUTER
 
-class UserUpdate(BaseModel):
-    name: Optional[str] = None
-    password: Optional[str] = None
-    role: Optional[UserRole] = None
+class Login_User(BaseModel):
+    email: Optional[EmailStr] = "test@example.com"
+    password: str = "test123456"
+    keepLogin: bool = True

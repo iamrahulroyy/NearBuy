@@ -1,25 +1,31 @@
 from pydantic import BaseModel
 from typing import Optional
 from uuid import UUID
+from app.db.schemas.user import Register_Vendor
 
-class ShopBase(BaseModel):
-    fullName: str
-    shopName: str
-    address: str
-    contact: Optional[str]
-    is_open: bool
+# class ShopBase(BaseModel):
+#     fullName: str
+#     shopName: str
+#     address: str
+#     contact: Optional[str]
+#     is_open: bool
 
-class ShopCreate(ShopBase):
+# class ShopCreate(ShopBase):
+#     owner_id: UUID
+#     latitude: float
+#     longitude: float
+
+# class ShopRead(ShopBase):
+#     id: int
+#     created_at: Optional[str]
+
+#     class Config:
+#         from_attributes = True
+
+class ShopCreate(Register_Vendor):
     owner_id: UUID
     latitude: float
     longitude: float
-
-class ShopRead(ShopBase):
-    id: int
-    created_at: Optional[str]
-
-    class Config:
-        from_attributes = True
 
 class ShopUpdate(BaseModel):
     fullName: Optional[str]

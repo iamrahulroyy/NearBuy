@@ -6,3 +6,6 @@ psycopg2
 geoalchemy2
 bcrypt
 pydantic[email]
+ua_parser
+argon2-cffi
+pyotp

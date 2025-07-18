@@ -1,28 +1,32 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from sqlmodel import SQLModel
-from app.db.session import engine
-from app.api.v1.endpoints.users import user_router 
-from app.api.v1.endpoints.shops import shop_router 
-from app.api.v1.endpoints.items import item_router 
-from app.api.v1.endpoints.inventory import inventory_router 
-from app.api.v1.endpoints.search import search_router 
-from app.api.v1.endpoints.status import status_router 
+from app.api.v1.endpoints.usersApi import user_router
+from app.db.session import DataBasePool 
+# from app.api.v1.endpoints.shopsApi import shop_router 
+# from app.api.v1.endpoints.itemsApi import item_router 
+# from app.api.v1.endpoints.inventoryApi import inventory_router 
+# from app.api.v1.endpoints.searchApi import search_router 
+# from app.api.v1.endpoints.statusApi import status_router 
+
+
+port = 8050
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    SQLModel.metadata.create_all(engine)
+    await DataBasePool.setup()
     yield
+    await DataBasePool.teardown()
 
 
 app = FastAPI(lifespan=lifespan)
 
 app.include_router(user_router)
-app.include_router(shop_router)
-app.include_router(item_router)
-app.include_router(inventory_router)
-app.include_router(search_router)
-app.include_router(status_router)
+# app.include_router(shop_router)
+# app.include_router(item_router)
+# app.include_router(inventory_router)
+# app.include_router(search_router)
+# app.include_router(status_router)
 
 
 @app.get("/")
@@ -32,4 +36,4 @@ def root():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
