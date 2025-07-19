@@ -17,7 +17,7 @@ class Register_Vendor(BaseModel):
     shopName: str = "test shop"
     address: str = "test address, sector V"
     contact: Optional[str] = "test contact"
-    email: Optional[EmailStr] = "test@example.com"
+    email: Optional[EmailStr] = "testvendor@example1.com"
     password: str = "test1234"
     role: UserRole = UserRole.VENDOR
 

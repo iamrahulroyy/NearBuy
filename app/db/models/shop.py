@@ -6,7 +6,7 @@ from geoalchemy2 import Geography
 from sqlalchemy import Column
 
 class Shop(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+    shop_id: Optional[int] = Field(default=None, primary_key=True)
     owner_id: UUID = Field(foreign_key="user.id")
     fullName: str
     shopName: str

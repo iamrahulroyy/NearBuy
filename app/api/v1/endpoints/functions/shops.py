@@ -30,3 +30,33 @@
 # def delete_shop(shop_id: int, session: Session = Depends(get_session)):
 #     delete_instance(session, Shop, shop_id)
 #     return {"detail": "Shop deleted"}
+
+
+from app.db.session import DB
+
+
+db = DB()
+
+class SDB:
+    def __init__(self):
+        pass
+
+    @staticmethod
+    async def create_shop(request, data, db_pool):
+        pass
+
+    @staticmethod
+    async def update_shop(request, data, db_pool):
+        pass
+
+    @staticmethod
+    async def view_shop(request, owner_id, db_pool):
+        pass
+
+    @staticmethod
+    async def get_shop(request, shop_id, db_pool):
+        pass
+    
+    @staticmethod
+    async def delete_shop(request, shop_id, db_pool):
+        pass
