@@ -60,3 +60,5 @@ class SDB:
     @staticmethod
     async def delete_shop(request, shop_id, db_pool):
         pass
+
+    

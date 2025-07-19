@@ -4,6 +4,7 @@ import traceback
 from typing import Optional
 from fastapi import Request,status
 from sqlmodel import SQLModel, Session, create_engine, delete, select
+from app.db.models.item import ITEM, ItemTableEnum
 from app.db.models.user import USER, USER_META, USER_SESSION, UserRole, UserTableEnum
 from app.helpers import variables
 from app.helpers.helpers import send_json_response
@@ -116,6 +117,8 @@ class DB:
                 data = USER_SESSION(**data)
             elif dbClassNam == UserTableEnum.USER_META:
                 data = USER_META(**data)
+            elif dbClassNam == ItemTableEnum.ITEM:
+                data = ITEM(**data)
             else:
                 return None, False
 
@@ -142,6 +145,144 @@ class DB:
             return False
 
 
+    # @classmethod
+    # async def get_item_by_name(self, itemName: str, db_pool: Session):
+    #     try:
+    #         statement = select(ITEM).where(ITEM.itemName == itemName)
+    #         item = db_pool.exec(statement).first()
+    #         return item
+    #     except Exception as e:
+    #         print(f"Exception in get_item_by_name: {str(e)}")
+    #         traceback.print_exc()
+    #         return None
+        
+    
+    @classmethod
+    async def get_attr_all(self, dbClassNam: str, db_pool: Session, filters: dict = None, all=True):
+        try:
+            models = {
+                ItemTableEnum.ITEM: ITEM,
+                UserTableEnum.USER: USER,
+                UserTableEnum.USER_META: USER_META,
+                UserTableEnum.USER_SESSION: USER_SESSION,
+            }
+
+            table = models.get(dbClassNam)
+            if not table:
+                return None
+            
+            statement = select(table)
+
+            if filters and isinstance(filters, dict):
+                for key, value in filters.items():
+                    if hasattr(table, key):
+                        column_attr = getattr(table, key)
+                        if isinstance(value, list):
+                            statement = statement.where(column_attr.in_(value))
+                        elif value is None:
+                            statement = statement.where(column_attr.is_(None))
+                        else:
+                            statement = statement.where(column_attr == value)
+            if all:
+                result = db_pool.exec(statement).all()
+            else:
+                result = db_pool.exec(statement).first()
+            return result
+        
+        except Exception as e:
+            traceback.print_exc()
+            if isinstance(db_pool, Session):
+                db_pool.rollback()
+            return None
+        
+    @classmethod
+    async def update_attr_all(cls, dbClassNam: str, data: dict, db_pool: Session, identifier: dict):
+        try:
+            table_map = {
+                ItemTableEnum.ITEM: ITEM,
+                UserTableEnum.USER: USER,
+                UserTableEnum.USER_META: USER_META,
+                UserTableEnum.USER_SESSION: USER_SESSION,
+                
+            }
+
+            table_class = table_map.get(dbClassNam)
+            if not table_class:
+                message = "Invalid table class name provided."
+                return message, False
+
+            statement = select(table_class)
+            for key, value in identifier.items():
+                if hasattr(table_class, key):
+                    statement = statement.where(getattr(table_class, key) == value)
+
+            record = db_pool.exec(statement).first()
+            if not record:
+                message = "Not found."
+                return message, False
+
+            # Check if all values are the same
+            all_same = True
+            for key, value in data.items():
+                if hasattr(record, key):
+                    if getattr(record, key) != value:
+                        all_same = False
+                        break
+
+            if all_same:
+                message = "All values are the same, no update needed."
+                return message, False
+
+            for key, value in data.items():
+                if hasattr(record, key):
+                    setattr(record, key, value)
+
+            db_pool.commit()
+            message = "Updated successfully."
+            return message, True
+
+        except Exception:
+            db_pool.rollback()
+            traceback.print_exc()
+            message = "Error updating."
+            return message, False
+
+    @classmethod
+    async def delete_attr(cls, dbClassNam: str, db_pool: Session, identifier: dict):
+        try:
+            table_map = {
+                ItemTableEnum.ITEM: ITEM,
+                UserTableEnum.USER: USER,
+                UserTableEnum.USER_META: USER_META,
+                UserTableEnum.USER_SESSION: USER_SESSION,
+            }
+
+            table_class = table_map.get(dbClassNam)
+            if not table_class:
+                message = "Invalid table class name provided."
+                return message, False
+
+            statement = select(table_class)
+            for key, value in identifier.items():
+                if hasattr(table_class, key):
+                    statement = statement.where(getattr(table_class, key) == value)
+
+            record = db_pool.exec(statement).first()
+            if not record:
+                message = "Not found."
+                return message, False
+
+            db_pool.delete(record)
+            db_pool.commit()
+            message = "Deleted successfully."
+            return message, True
+
+        except Exception:
+            db_pool.rollback()
+            traceback.print_exc()
+            message = "Error deleting."
+            return message, False
+
 
 def authentication_required(func):
     @wraps(func)
@@ -151,10 +292,10 @@ def authentication_required(func):
             request: Request = kwargs.get("request")
 
             if not request:
-                return send_json_response(message="Authentication token not provided.", status=status.HTTP_403_FORBIDDEN, body={})
+                return send_json_response(message="Authentication token not provided 1.", status=status.HTTP_403_FORBIDDEN, body={})
             session_token: Optional[str] = request.cookies.get(variables.COOKIE_KEY, None)
             if not session_token:
-                return send_json_response(message="Authentication token not provided.", status=status.HTTP_403_FORBIDDEN, body={})
+                return send_json_response(message="Authentication token not provided 2.", status=status.HTTP_403_FORBIDDEN, body={})
 
             if db_pool:
                 user_session = await DB.getUserSession(db_pool, session_token)
@@ -172,7 +313,7 @@ def authentication_required(func):
             if db_pool:
                 db_pool.rollback()  
             traceback.print_exc()
-            return send_json_response(message="Authentication token not provided.", status=status.HTTP_403_FORBIDDEN, body={})
+            return send_json_response(message="Authentication token not provided 3.", status=status.HTTP_403_FORBIDDEN, body={})
         return await func(*args, **kwargs) 
     return wrapper
 

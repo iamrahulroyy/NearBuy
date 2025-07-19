@@ -21,3 +21,13 @@
 
 #     inventory = session.exec(select(Inventory).where(Inventory.item_id == item.id)).all()
 #     return inventory
+
+
+
+# @shop_router.get("/search_shops")
+# async def search_shops_endpoint():
+#     return await sdb.search_shops()
+
+# @item_router.get("/search items")
+# async def search_items_endpoint():
+#     return await idb.search_items()

@@ -1,12 +1,14 @@
-import time
-from sqlmodel import Column, Integer, SQLModel, Field
+from enum import Enum
+import uuid
+from sqlmodel import UUID, Column, SQLModel, Field
 from typing import Optional
 
-class Item(SQLModel, table=True):
-    id: Optional[int] = Field(
-        default=None,
-        primary_key=True,
-        sa_column=Column(Integer, primary_key=True, autoincrement=True)
+class ItemTableEnum(str, Enum):
+    ITEM = "ITEM"
+class ITEM(SQLModel, table=True):
+    id: uuid.UUID = Field(
+        default_factory=uuid.uuid4,
+        sa_column=Column(UUID(as_uuid=True), primary_key=True, index=True)
     )
     itemName: str = Field(index=True, unique=True)
     price: float

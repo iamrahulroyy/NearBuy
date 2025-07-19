@@ -7,6 +7,7 @@ from sqlmodel import Session
 from app.db.models.user import ReasonEnum, UserTableEnum
 from app.db.schemas.user import Login_User
 from app.db.session import DB
+from app.helpers import variables
 from app.helpers.helpers import get_fastApi_req_data, send_json_response
 from app.helpers.loginHelper import security
 
@@ -51,6 +52,14 @@ async def login(request: Request, data: Login_User, db_pool: Session):
         await uDB.insert(dbClassNam=UserTableEnum.USER_META, data=USER_META, db_pool=db_pool)
 
         response = send_json_response(message="User logged in successfully", status=status.HTTP_200_OK, body=[])
+        response.set_cookie(
+            key=variables.COOKIE_KEY,
+            value=token,
+            max_age=max_age,
+            httponly=True,
+            secure=False,  # Set to True in production with HTTPS
+            samesite="lax"
+        )
         return response
     except Exception as e:
         print("Exception caught at User Signin: ", str(e))
