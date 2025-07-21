@@ -1,5 +1,6 @@
 import logging
 import secrets
+import uuid
 from fastapi import Request
 from pydantic import BaseModel
 from typing import Any, Dict, Optional
@@ -123,3 +124,14 @@ def generate_unique_id(length: int = 8) -> str:
         str: A random unique string of hexadecimal characters.
     """
     return secrets.token_hex(length)
+
+
+def recursive_to_str(obj):
+    if isinstance(obj, uuid.UUID):
+        return str(obj)
+    elif isinstance(obj, list):
+        return [recursive_to_str(i) for i in obj]
+    elif isinstance(obj, dict):
+        return {k: recursive_to_str(v) for k, v in obj.items()}
+    else:
+        return obj

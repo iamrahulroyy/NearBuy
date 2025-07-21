@@ -29,5 +29,5 @@ class Register_STATE_CONTRIBUTER(BaseModel):
 
 class Login_User(BaseModel):
     email: Optional[EmailStr] = "test@example.com"
-    password: str = "test123456"
+    password: str = "test1234"
     keepLogin: bool = True

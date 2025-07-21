@@ -1,3 +1,4 @@
+import uuid
 from pydantic import BaseModel
 from typing import Optional
 from uuid import UUID
@@ -28,11 +29,12 @@ class ShopCreate(Register_Vendor):
     longitude: float
 
 class ShopUpdate(BaseModel):
-    fullName: Optional[str]
-    shopName: Optional[str]
-    contact: Optional[str]
-    address: Optional[str]
-    is_open: Optional[bool]
-    latitude: Optional[float]
-    longitude: Optional[float]
-    note: str
+    shop_id: str =  None
+    fullName: Optional[str] =  None
+    shopName: Optional[str]=  None
+    contact: Optional[str]=  None
+    address: Optional[str]=  None
+    is_open: Optional[bool]=  None
+    latitude: Optional[float]=  None
+    longitude: Optional[float]=  None
+    note: Optional[str] =  None

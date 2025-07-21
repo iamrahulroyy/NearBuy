@@ -24,11 +24,11 @@ async def view_shop_endpoint(request: Request, owner_id: str, db_pool=Depends(Da
 
 @shop_router.get("/{shop_id}")
 @authentication_required
-async def get_shop_endpoint(request: Request, shop_id: int, db_pool=Depends(DataBasePool.get_pool)):
+async def get_shop_endpoint(request: Request, shop_id: str, db_pool=Depends(DataBasePool.get_pool)):
     return await sdb.get_shop(request, shop_id, db_pool)
 
 @shop_router.delete("/{shop_id}")
 @authentication_required
-async def delete_shop_endpoint(request: Request, shop_id: int, db_pool=Depends(DataBasePool.get_pool)):
+async def delete_shop_endpoint(request: Request, shop_id: str, db_pool=Depends(DataBasePool.get_pool)):
     return await sdb.delete_shop(request, shop_id, db_pool)
 

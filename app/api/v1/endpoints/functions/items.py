@@ -47,6 +47,8 @@ class IDB:
             serialized_item = jsonable_encoder(inserted_item)
             serialized_item.pop("id", None)
 
+            db_pool.commit()
+            
             return send_json_response(message="Item added successfully", status=status.HTTP_201_CREATED, body=serialized_item)
             
         except Exception as e:

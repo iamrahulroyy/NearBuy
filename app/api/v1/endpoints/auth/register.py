@@ -59,6 +59,8 @@ async def user_signup(request: Request, data: Register_User, db_pool: Session):
         await uDB.insert(dbClassNam=UserTableEnum.USER_META, data=USER_META_DATA, db_pool=db_pool)
         
         serialized_inserted_user.pop("id", None)
+
+        db_pool.commit()
         return send_json_response(message="User registered successfully", status=status.HTTP_201_CREATED, body=serialized_inserted_user)
         
     except Exception as e:
@@ -137,6 +139,9 @@ async def vendor_signup(request: Request, data: Register_Vendor, db_pool: Sessio
         await uDB.insert(dbClassNam=UserTableEnum.USER_META, data=VENDOR_META_DATA, db_pool=db_pool)
         
         serialized_inserted_vendor.pop("id", None)
+
+        db_pool.commit()
+
         return send_json_response(message="Vendor registered successfully", status=status.HTTP_201_CREATED, body=serialized_inserted_vendor)
         
     except Exception as e:
@@ -192,6 +197,8 @@ async def contributor_signup(request: Request, data: Register_STATE_CONTRIBUTER,
         await uDB.insert(dbClassNam=UserTableEnum.USER_META, data=CONTRIBUTOR_META_DATA, db_pool=db_pool)
         
         serialized_inserted_contributor.pop("id", None)
+
+        db_pool.commit()
         return send_json_response(message="Contributor registered successfully", status=status.HTTP_201_CREATED, body=serialized_inserted_contributor)
         
     except Exception as e:

@@ -5,6 +5,7 @@ from typing import Optional
 from fastapi import Request,status
 from sqlmodel import SQLModel, Session, create_engine, delete, select
 from app.db.models.item import ITEM, ItemTableEnum
+from app.db.models.shop import SHOP, ShopTableEnum
 from app.db.models.user import USER, USER_META, USER_SESSION, UserRole, UserTableEnum
 from app.helpers import variables
 from app.helpers.helpers import send_json_response
@@ -109,7 +110,7 @@ class DB:
                 return None
 
     @classmethod
-    async def insert(self, dbClassNam: str, data: dict, db_pool: Session, commit: bool = True):
+    async def insert(self, dbClassNam: str, data: dict, db_pool: Session, commit: bool = False):
         try:
             if dbClassNam == UserTableEnum.USER:
                 data = USER(**data)
@@ -119,6 +120,8 @@ class DB:
                 data = USER_META(**data)
             elif dbClassNam == ItemTableEnum.ITEM:
                 data = ITEM(**data)
+            elif dbClassNam == ShopTableEnum.SHOP:
+                data = SHOP(**data)
             else:
                 return None, False
 
@@ -165,6 +168,7 @@ class DB:
                 UserTableEnum.USER: USER,
                 UserTableEnum.USER_META: USER_META,
                 UserTableEnum.USER_SESSION: USER_SESSION,
+                ShopTableEnum.SHOP: SHOP,
             }
 
             table = models.get(dbClassNam)
@@ -203,6 +207,8 @@ class DB:
                 UserTableEnum.USER: USER,
                 UserTableEnum.USER_META: USER_META,
                 UserTableEnum.USER_SESSION: USER_SESSION,
+                ShopTableEnum.SHOP: SHOP,
+
                 
             }
 
@@ -255,6 +261,8 @@ class DB:
                 UserTableEnum.USER: USER,
                 UserTableEnum.USER_META: USER_META,
                 UserTableEnum.USER_SESSION: USER_SESSION,
+                ShopTableEnum.SHOP: SHOP,
+
             }
 
             table_class = table_map.get(dbClassNam)

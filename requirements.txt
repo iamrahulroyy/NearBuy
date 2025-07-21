@@ -9,3 +9,4 @@ pydantic[email]
 ua_parser
 argon2-cffi
 pyotp
+shapely

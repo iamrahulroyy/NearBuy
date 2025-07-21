@@ -1,3 +1,5 @@
+from enum import Enum
+import uuid
 import time
 from sqlmodel import Integer, SQLModel, Field, func
 from typing import Optional
@@ -5,8 +7,15 @@ from uuid import UUID
 from geoalchemy2 import Geography
 from sqlalchemy import Column
 
-class Shop(SQLModel, table=True):
-    shop_id: Optional[int] = Field(default=None, primary_key=True)
+class ShopTableEnum(str, Enum):
+    SHOP = "SHOP"
+
+class SHOP(SQLModel, table=True):
+    shop_id: Optional[uuid.UUID] = Field(
+        default_factory=uuid.uuid4,
+        primary_key=True,
+        index=True
+    )
     owner_id: UUID = Field(foreign_key="user.id")
     fullName: str
     shopName: str
