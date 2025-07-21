@@ -292,28 +292,28 @@ def authentication_required(func):
             request: Request = kwargs.get("request")
 
             if not request:
-                return send_json_response(message="Authentication token not provided 1.", status=status.HTTP_403_FORBIDDEN, body={})
+                return send_json_response(message="Unable to process authentication.", status=status.HTTP_400_BAD_REQUEST, body={})
             session_token: Optional[str] = request.cookies.get(variables.COOKIE_KEY, None)
             if not session_token:
-                return send_json_response(message="Authentication token not provided 2.", status=status.HTTP_403_FORBIDDEN, body={})
+                return send_json_response(message="Authentication token not provided.", status=status.HTTP_401_UNAUTHORIZED, body={})
 
             if db_pool:
                 user_session = await DB.getUserSession(db_pool, session_token)
                 if not user_session:
-                    return send_json_response(message="Session expired/invalid, please login again", status=status.HTTP_403_FORBIDDEN, body={})
+                    return send_json_response(message="Session expired or invalid. Please login again.", status=status.HTTP_401_UNAUTHORIZED, body={})
 
                 if int(time.time()) > user_session.expired_at:
                     statement = delete(USER_SESSION).where(USER_SESSION.pk == session_token)
                     db_pool.exec(statement)
                     db_pool.commit()
-                    return send_json_response(message="Session expired/invalid, please login again", status=status.HTTP_403_FORBIDDEN, body={})
+                    return send_json_response(message="Session expired. Please login again.", status=status.HTTP_401_UNAUTHORIZED, body={})
                 kwargs["request"].state.emp = user_session 
         except Exception as e:
             print("Exception caught at authentication wrapper: ", str(e))
             if db_pool:
                 db_pool.rollback()  
             traceback.print_exc()
-            return send_json_response(message="Authentication token not provided 3.", status=status.HTTP_403_FORBIDDEN, body={})
+            return send_json_response(message="Error during authentication.", status=status.HTTP_500_INTERNAL_SERVER_ERROR, body={})
         return await func(*args, **kwargs) 
     return wrapper
 
@@ -324,27 +324,27 @@ def ADMIN_AUTHENTICATION_ONLY(func):
             db_pool: Optional[Session] = kwargs.get("db_pool", None)
             request: Request = kwargs.get("request")
             if not request:
-                return send_json_response(message="Authentication token not provided", status=status.HTTP_403_FORBIDDEN, body={})
+                return send_json_response(message="Unable to process authentication.", status=status.HTTP_400_BAD_REQUEST, body={})
             session_token: Optional[str] = request.cookies.get(variables.COOKIE_KEY, None)
             if not session_token:
                 return send_json_response(message="Authentication token not provided.", status=status.HTTP_403_FORBIDDEN, body={})
             if db_pool:
                 user_session = await DB.getUserSession(db_pool, session_token)
                 if not user_session:
-                    return send_json_response(message="Session expired/invalid, please login again.", status=status.HTTP_403_FORBIDDEN, body={})
+                    return send_json_response(message="Session expired or invalid. Please login again.", status=status.HTTP_401_UNAUTHORIZED, body={})
                 if int(time.time()) > user_session.expired_at:
                     statement = delete(USER_SESSION).where(USER_SESSION.pk == session_token)
                     db_pool.exec(statement)
                     db_pool.commit()
-                    return send_json_response(message="Session expired/invalid, please login again.", status=status.HTTP_403_FORBIDDEN, body={})
+                    return send_json_response(message="Session expired. Please login again.", status=status.HTTP_401_UNAUTHORIZED, body={})
                 if user_session.role != UserRole.ADMIN: 
-                    return send_json_response(message="Access forbidden: Insufficient privileges.", status=status.HTTP_403_FORBIDDEN, body={})
+                    return send_json_response(message="Insufficient privileges.", status=status.HTTP_403_FORBIDDEN, body={})
                 kwargs["request"].state.emp = user_session
         except Exception as e:
             print("Exception caught at admin authentication wrapper: ", str(e))
             if db_pool:
                 db_pool.rollback()
             traceback.print_exc()
-            return send_json_response(message="Authentication token not provided.", status=status.HTTP_403_FORBIDDEN, body={})
+            return send_json_response(message="Error during authentication.", status=status.HTTP_500_INTERNAL_SERVER_ERROR, body={})
         return await func(*args, **kwargs)
     return wrapper
