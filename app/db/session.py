@@ -4,6 +4,7 @@ import traceback
 from typing import Optional
 from fastapi import Request,status
 from sqlmodel import SQLModel, Session, create_engine, delete, select
+from app.db.models.inventory import INVENTORY, InventoryTableEnum
 from app.db.models.item import ITEM, ItemTableEnum
 from app.db.models.shop import SHOP, ShopTableEnum
 from app.db.models.user import USER, USER_META, USER_SESSION, UserRole, UserTableEnum
@@ -122,6 +123,8 @@ class DB:
                 data = ITEM(**data)
             elif dbClassNam == ShopTableEnum.SHOP:
                 data = SHOP(**data)
+            elif dbClassNam == InventoryTableEnum.INVENTORY:
+                data = INVENTORY(**data)
             else:
                 return None, False
 
@@ -169,6 +172,7 @@ class DB:
                 UserTableEnum.USER_META: USER_META,
                 UserTableEnum.USER_SESSION: USER_SESSION,
                 ShopTableEnum.SHOP: SHOP,
+                InventoryTableEnum.INVENTORY: INVENTORY,
             }
 
             table = models.get(dbClassNam)
@@ -208,6 +212,7 @@ class DB:
                 UserTableEnum.USER_META: USER_META,
                 UserTableEnum.USER_SESSION: USER_SESSION,
                 ShopTableEnum.SHOP: SHOP,
+                InventoryTableEnum.INVENTORY: INVENTORY,
 
                 
             }
@@ -262,6 +267,8 @@ class DB:
                 UserTableEnum.USER_META: USER_META,
                 UserTableEnum.USER_SESSION: USER_SESSION,
                 ShopTableEnum.SHOP: SHOP,
+                InventoryTableEnum.INVENTORY: INVENTORY,
+
 
             }
 

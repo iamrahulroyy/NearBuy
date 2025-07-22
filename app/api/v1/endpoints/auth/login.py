@@ -51,6 +51,9 @@ async def login(request: Request, data: Login_User, db_pool: Session):
         }
         await uDB.insert(dbClassNam=UserTableEnum.USER_META, data=USER_META, db_pool=db_pool)
 
+        db_pool.commit()
+
+
         response = send_json_response(message="User logged in successfully", status=status.HTTP_200_OK, body=[])
         response.set_cookie(
             key=variables.COOKIE_KEY,

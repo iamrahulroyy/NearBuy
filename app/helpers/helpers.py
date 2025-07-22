@@ -135,3 +135,9 @@ def recursive_to_str(obj):
         return {k: recursive_to_str(v) for k, v in obj.items()}
     else:
         return obj
+
+def extract_model(obj):
+    # If it's a tuple (row), return first element, else as is
+    if isinstance(obj, tuple):
+        return obj[0]
+    return obj

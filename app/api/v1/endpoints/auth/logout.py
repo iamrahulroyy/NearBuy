@@ -10,6 +10,9 @@ uDB = DB()
 async def logout(request:Request, db_pool: Session):
     try:
         await uDB.delete(request.state.emp, db_pool)
+
+        db_pool.commit()
+
         response = send_json_response(message="Logged out successfully",status=status.HTTP_200_OK,body={})
         response.delete_cookie(key=variables.COOKIE_KEY)
         return response
