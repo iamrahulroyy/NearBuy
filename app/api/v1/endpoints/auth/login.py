@@ -98,3 +98,28 @@ async def login(request: Request, data: Login_User, db_pool: Session):
             status=status.HTTP_401_UNAUTHORIZED,
             body={}
         )
+
+
+async def check_auth_status(request: Request, db_pool: Session):
+    try:
+        user = request.state.emp
+        
+        user_info = jsonable_encoder(user)
+        sensitive_fields = ["password", "try_count", "updated_at"]
+        for field in sensitive_fields:
+            user_info.pop(field, None)
+            
+        return send_json_response(
+            message="Session is valid.",
+            status=status.HTTP_200_OK,
+            body=user_info
+        )
+        
+    except Exception as e:
+        print(f"Exception caught at checking user logged state: {e}")
+        traceback.print_exc()
+        return send_json_response(
+            message="Failed to process user auth status.",
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            body={}
+        )

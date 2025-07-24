@@ -93,3 +93,26 @@ if __name__ == "__main__":
     import asyncio
     asyncio.run(setup_db())
     run()
+
+# ------------------- fake_data -------------------
+# {
+#   "fullName": "Neha Singh",
+#   "email": "neha.singh@govstatsportal.in",
+#   "password": "Neha@2024",
+#   "role": "STATE_CONTRIBUTER"
+# }
+# {
+#   "fullName": "Karan Mehta",
+#   "email": "karan.mehta@examplemail.com",
+#   "password": "Karan@1234",
+#   "role": "USER"
+# }
+# {
+#   "fullName": "Anita Verma",
+#   "shopName": "Verma Handicrafts",
+#   "address": "45 MG Road, Sector 14, Gurugram, Haryana",
+#   "contact": "+91-9811122233",
+#   "email": "anita.verma@vermahandicrafts.com",
+#   "password": "Anita@2024",
+#   "role": "VENDOR"
+# }

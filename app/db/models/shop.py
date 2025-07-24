@@ -15,7 +15,7 @@ class SHOP(SQLModel, table=True):
         default_factory=uuid.uuid4,
         primary_key=True,
         index=True
-    )
+    ) 
     owner_id: UUID = Field(foreign_key="user.id")
     fullName: str
     shopName: str

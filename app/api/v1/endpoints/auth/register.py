@@ -53,6 +53,7 @@ async def user_signup(request: Request, data: Register_User, db_pool: Session):
             "email": email,
             "reason": ReasonEnum.SIGNUP,
             "browser": apiData.browser,
+            "role": UserRole.USER,
             "os": apiData.os
         }
         
@@ -133,6 +134,7 @@ async def vendor_signup(request: Request, data: Register_Vendor, db_pool: Sessio
             "email": email,
             "reason": ReasonEnum.SIGNUP,
             "browser": apiData.browser,
+            "role": UserRole.VENDOR,
             "os": apiData.os
         }
         
@@ -191,6 +193,7 @@ async def contributor_signup(request: Request, data: Register_STATE_CONTRIBUTER,
             "email": email,
             "reason": ReasonEnum.SIGNUP,
             "browser": apiData.browser,
+            "role": UserRole.STATE_CONTRIBUTER,
             "os": apiData.os
         }
         

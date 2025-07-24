@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Request
-from app.api.v1.endpoints.auth.login import login
+from app.api.v1.endpoints.auth.login import check_auth_status, login
 from app.api.v1.endpoints.auth.logout import logout
 from app.api.v1.endpoints.auth.register import contributor_signup, user_signup, vendor_signup
 from app.api.v1.endpoints.functions.users import UDB
@@ -31,3 +31,8 @@ async def unified_login(request: Request, data: Login_User, db_pool=Depends(Data
 @authentication_required([UserRole.USER,UserRole.VENDOR,UserRole.ADMIN,UserRole.STATE_CONTRIBUTER])
 async def unified_logout(request: Request,db_pool=Depends(DataBasePool.get_pool)):
     return await logout(request, db_pool)
+
+@user_router.get("/auth", name="Check User Logged Status")
+@authentication_required([UserRole.USER, UserRole.VENDOR, UserRole.ADMIN, UserRole.STATE_CONTRIBUTER])
+async def unified_check_auth(request: Request,db_pool=Depends(DataBasePool.get_pool)):
+    return await check_auth_status(request,db_pool)
