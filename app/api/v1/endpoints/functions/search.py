@@ -1,33 +1,33 @@
-# from fastapi import APIRouter, Depends, Query, HTTPException
-# from sqlmodel import Session, select
-# from typing import List
-# from app.db.session import get_session
-# from app.db.models.inventory import Inventory
-# from app.db.models.item import Item
-# from app.db.models.shop import Shop
-# from app.db.schemas.inventory import InventoryRead
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
+from app.db.models.shop import SHOP
+from app.db.models.item import ITEM
+from app.helpers.helpers import send_json_response
+import traceback
 
-# search_router = APIRouter(prefix="/search", tags=["Search"])
+class SearchDB:
 
+    async def search_shops(self, request, q: str, db_pool):
+        try:
+            # SQLModel uses select + where - for ILIKE, use .ilike() of column with the search pattern
+            stmt = select(SHOP).where(SHOP.shopName.ilike(f"%{q}%"))
+            result = db_pool.exec(stmt).scalars().all()  # scalars() returns model instances
 
-# @search_router.get("/", response_model=List[InventoryRead])
-# def search_inventory(
-#     item_name: str = Query(..., min_length=1),
-#     session: Session = Depends(get_session)
-# ):
-#     item = session.exec(select(Item).where(Item.name.ilike(f"%{item_name}%"))).first()
-#     if not item:
-#         raise HTTPException(status_code=404, detail="Item not found")
+            shops = [shop.model_dump(mode='json') for shop in result]
 
-#     inventory = session.exec(select(Inventory).where(Inventory.item_id == item.id)).all()
-#     return inventory
+            return send_json_response(message="Shop search results", status=200, body=shops)
+        except Exception as e:
+            traceback.print_exc()
+            return send_json_response(message="Error searching shops", status=500, body=[])
 
+    async def search_items(self, request, q: str, db_pool):
+        try:
+            stmt = select(ITEM).where((ITEM.itemName.ilike(f"%{q}%")) |(ITEM.description.ilike(f"%{q}%")))
+            result = db_pool.exec(stmt).scalars().all()
 
+            items = [item.model_dump(mode='json') for item in result]
 
-# @shop_router.get("/search_shops")
-# async def search_shops_endpoint():
-#     return await sdb.search_shops()
-
-# @item_router.get("/search items")
-# async def search_items_endpoint():
-#     return await idb.search_items()
+            return send_json_response(message="Item search results", status=200, body=items)
+        except Exception as e:
+            traceback.print_exc()
+            return send_json_response(message="Error searching items", status=500, body=[])

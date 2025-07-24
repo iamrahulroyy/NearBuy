@@ -6,8 +6,8 @@ from app.db.session import DataBasePool
 from app.api.v1.endpoints.shopsApi import shop_router 
 from app.api.v1.endpoints.itemsApi import item_router 
 from app.api.v1.endpoints.inventoryApi import inventory_router 
-# from app.api.v1.endpoints.searchApi import search_router 
-# from app.api.v1.endpoints.statusApi import status_router 
+from app.api.v1.endpoints.searchApi import search_router 
+from app.api.v1.endpoints.statusApi import status_router 
 
 
 port = 8050
@@ -25,8 +25,8 @@ app.include_router(user_router)
 app.include_router(shop_router)
 app.include_router(item_router)
 app.include_router(inventory_router)
-# app.include_router(search_router)
-# app.include_router(status_router)
+app.include_router(search_router)
+app.include_router(status_router)
 
 
 @app.get("/")

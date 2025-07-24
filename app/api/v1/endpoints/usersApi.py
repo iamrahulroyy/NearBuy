@@ -3,6 +3,7 @@ from app.api.v1.endpoints.auth.login import login
 from app.api.v1.endpoints.auth.logout import logout
 from app.api.v1.endpoints.auth.register import contributor_signup, user_signup, vendor_signup
 from app.api.v1.endpoints.functions.users import UDB
+from app.db.models.user import UserRole
 from app.db.schemas.user import Login_User, Register_STATE_CONTRIBUTER, Register_User, Register_Vendor
 from app.db.session import DB, DataBasePool, authentication_required
 
@@ -27,6 +28,6 @@ async def unified_login(request: Request, data: Login_User, db_pool=Depends(Data
     return await login(request, data, db_pool)
     
 @user_router.post("/logout")
-@authentication_required
+@authentication_required([UserRole.USER,UserRole.VENDOR,UserRole.ADMIN,UserRole.STATE_CONTRIBUTER])
 async def unified_logout(request: Request,db_pool=Depends(DataBasePool.get_pool)):
     return await logout(request, db_pool)

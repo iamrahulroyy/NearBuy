@@ -41,6 +41,7 @@ class USER(SQLModel, table=True):
 class USER_SESSION(SQLModel, table=True):
     pk: str = Field(primary_key=True)
     email: str
+    role: UserRole = Field(index=True) 
     ip: Optional[str]
     browser: Optional[str]
     os: Optional[str]
