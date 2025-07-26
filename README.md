@@ -18,7 +18,7 @@ This backend is designed with extensibility, scalability, and modularity in mind
 
 ---
 
-## 🚀 API Overview (Might change with time)
+## 🚀 API Overview (Might change with time) [NOT UPDATED]
 
 | Method | Endpoint                        | Description                                |
 |--------|----------------------------------|--------------------------------------------|
