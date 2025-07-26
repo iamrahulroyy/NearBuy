@@ -105,7 +105,7 @@ FastAPI
 
 PostgreSQL + PostGIS
 
-SQLAlchemy & Alembic
+SQLAlchemy Models & Alembic
 
 Fellow devs and open-source contributors
 
