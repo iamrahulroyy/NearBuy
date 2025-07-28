@@ -7,12 +7,12 @@ from app.api.v1.endpoints.functions.search import SearchDB
 search_router = APIRouter(prefix="/search", tags=["Search"])
 searchdb = SearchDB()
 
-@search_router.get("/shops")
-@authentication_required([UserRole.USER, UserRole.VENDOR, UserRole.ADMIN, UserRole.STATE_CONTRIBUTER])
+@search_router.get("/shops", description="Search for shops by name {public}")
+# @authentication_required([UserRole.USER, UserRole.VENDOR, UserRole.ADMIN, UserRole.STATE_CONTRIBUTER])
 async def search_shops_endpoint(request: Request, q: str = Query(..., description="Search query for shop name"),db_pool=Depends(DataBasePool.get_pool)):
     return await searchdb.search_shops(request, q, db_pool)
 
-@search_router.get("/items")
-@authentication_required([UserRole.USER, UserRole.VENDOR, UserRole.ADMIN, UserRole.STATE_CONTRIBUTER])
+@search_router.get("/items", description="Search for items by name or description {public}")
+# @authentication_required([UserRole.USER, UserRole.VENDOR, UserRole.ADMIN, UserRole.STATE_CONTRIBUTER])
 async def search_items_endpoint(request: Request, q: str = Query(..., description="Search query for item"),db_pool=Depends(DataBasePool.get_pool)):
     return await searchdb.search_items(request, q, db_pool)

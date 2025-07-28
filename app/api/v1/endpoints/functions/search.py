@@ -13,7 +13,7 @@ class SearchDB:
             stmt = select(SHOP).where(SHOP.shopName.ilike(f"%{q}%"))
             result = db_pool.exec(stmt).scalars().all()  # scalars() returns model instances
 
-            shops = [shop.model_dump(mode='json') for shop in result]
+            shops = [shop.model_dump(mode='json', exclude={'location'}) for shop in result]
 
             return send_json_response(message="Shop search results", status=200, body=shops)
         except Exception as e:
