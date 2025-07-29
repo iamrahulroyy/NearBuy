@@ -1,43 +1,47 @@
-# 🧭 Hyperlocal Shop Finder – Backend
+Of course, here is an updated README.md for your project.
 
+🧭 Hyperlocal Shop Finder – Backend
 A location-based backend service that helps users discover nearby shops (within a 2–5 meter radius) that stock specific items — like “Maggie”, “batteries”, or “coffee sachets” — with real-time availability, quantity, and shop status.
 
 This backend is designed with extensibility, scalability, and modularity in mind — ideal for production-grade deployments as well as developer onboarding.
 
----
+✨ Features
+Geo-based Search API — find shops within 2–5m that stock an item.
 
-## ✨ Features
+Inventory Tracking — per shop, per item, with real-time quantity updates.
 
-- 🔍 **Geo-based Search API** — find shops within 2–5 meters that have a given item
-- 🛒 **Inventory Tracking** — per shop, per item, with real-time quantity updates
-- 📍 **PostGIS Spatial Queries** — accurate distance-based shop lookup
-- 🧾 **Modular API Structure** — RESTful and versioned (`/api/v1`)
-- 🔐 **Cookie-based Auth** — optional login for users, mandatory for shop owners
-- 🧱 **Clean Architecture** — with layered services, reusable schema, and test coverage
-- 🐳 **Docker-Ready** — includes dev containers with PostgreSQL + PostGIS
+PostGIS Spatial Queries — accurate distance-based shop lookup.
 
----
+Modular API Structure — RESTful and versioned (/api/v1).
 
-## 🚀 API Overview (Might change with time) [NOT UPDATED]
+Cookie-based Auth — optional login for users, mandatory for shop owners.
 
-| Method | Endpoint                        | Description                                |
-|--------|----------------------------------|--------------------------------------------|
-| `POST` | `/auth/register`                | Register a new user or shop owner          |
-| `POST` | `/auth/login`                   | Cookie-based login                         |
-| `POST` | `/auth/logout`                  | Logout and clear session                   |
-| `GET`  | `/search?lat=&lon=&item=`       | Find shops within 2–5m that stock an item  |
-| `POST` | `/shops/`                       | Create a shop (requires owner auth)        |
-| `GET`  | `/shops/{id}`                   | Get shop details                           |
-| `PATCH`| `/shops/{id}/status`            | Toggle open/closed status (owner-only)     |
-| `POST` | `/items/`                       | Add new items to the system                |
-| `POST` | `/inventory/`                   | Update quantity of an item in a shop       |
+Clean Architecture — with layered services, reusable schema, and test coverage.
 
----
+Docker-Ready — includes dev containers with PostgreSQL + PostGIS.
 
-## 🗂️ Project Structure
+🚀 API Overview
+Method	Endpoint	Description
+POST	/users/signup/user	Register a new user.
+POST	/users/signup/vendor	Register a new vendor.
+POST	/users/signup/contributor	Register a new contributor.
+POST	/users/login	Cookie-based login for all user types.
+POST	/users/logout	Logout and clear the session.
+GET	/search/shops	Search for shops by name.
+GET	/search/items	Search for items by name or description.
+POST	/shops/create_shop	Create a shop (requires vendor or admin auth).
+GET	/shops/{shop_id}	Get shop details.
+PATCH	/shops/update_shop	Update shop details (requires vendor or admin auth).
+DELETE	/shops/{shop_id}	Delete a shop (requires admin auth).
+POST	/items/add_item	Add a new item to a shop (requires vendor or admin auth).
+PATCH	/items/update_item	Update an item in a shop (requires vendor or admin auth).
+DELETE	/items/delete_item	Delete an item from a shop (requires vendor or admin auth).
+POST	/inventory/add	Add inventory for an item in a shop (requires vendor or admin auth).
+PATCH	/inventory/update	Update the inventory of an item in a shop (requires vendor or admin auth).
+DELETE	/inventory/{inventory_id}	Delete an inventory record (requires vendor or admin auth).
 
-
-
+Export to Sheets
+🗂️ Project Structure
 NEARBUY/
 ├── app/
 │ ├── api/ # All API endpoints (versioned, modular)
@@ -52,20 +56,17 @@ NEARBUY/
 ├── Dockerfile
 ├── .env # App config
 └── README.md
+⚙️ Setup & Run (Local Dev)
+📦 Requirements
+Python 3.10+
 
+Docker + Docker Compose
 
----
+make (optional for CLI commands)
 
-## ⚙️ Setup & Run (Local Dev)
+🔧 Steps
+Bash
 
-### 📦 Requirements
-- Python 3.10+
-- Docker + Docker Compose
-- `make` (optional for CLI commands)
-
-### 🔧 Steps
-
-```bash
 # Clone and go into backend dir
 git clone https://github.com/iamrahulroyy/NearBuy
 cd NearBuy
@@ -78,27 +79,26 @@ docker-compose exec backend alembic upgrade head
 
 # Seed sample data (optional)
 docker-compose exec backend python scripts/seed_data.py
-
 🧪 Testing
+Bash
+
 docker-compose exec backend pytest
-
-
 🔮 Roadmap
- Add email/password recovery
+Add email/password recovery
 
- Admin dashboard for shop owners
+Admin dashboard for shop owners
 
- Caching layer (Redis) for heavy search traffic
+Caching layer (Redis) for heavy search traffic
 
- WebSocket or long polling for real-time stock updates
+WebSocket or long polling for real-time stock updates
 
- QR-based shop linking for instant scan & find
+QR-based shop linking for instant scan & find
 
 🤝 Contributing
-Pull requests and ideas welcome! Please keep contributions modular and follow naming/style conventions already established in the repo.
+Pull requests and ideas are welcome! Please keep contributions modular and follow the naming/style conventions already established in the repo.
 
 📜 License
-MIT ©Rahul Roy
+MIT © Rahul Roy
 
 🙏 Acknowledgements
 FastAPI
@@ -108,4 +108,3 @@ PostgreSQL + PostGIS
 SQLAlchemy Models & Alembic
 
 Fellow devs and open-source contributors
-
