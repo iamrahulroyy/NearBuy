@@ -86,10 +86,12 @@ docker-compose exec backend alembic upgrade head
 
 # Seed sample data (optional)
 docker-compose exec backend python scripts/seed_data.py
-
+```
 
 🧪 Testing
+```bash
 docker-compose exec backend pytest
+```
 
 🔮 Roadmap
 Add email/password recovery
