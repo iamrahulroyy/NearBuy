@@ -94,27 +94,19 @@ docker-compose exec backend pytest
 ```
 
 🔮 Roadmap
+
 Add email/password recovery
-
 Admin dashboard for shop owners
-
 Caching layer (Redis) for heavy search traffic
-
 WebSocket or long polling for real-time stock updates
-
 QR-based shop linking for instant scan & find
+
 
 🤝 Contributing
 Pull requests and ideas are welcome! Please keep contributions modular and follow the naming/style conventions already established in the repo.
 
 📜 License
 MIT © Rahul Roy
-
 🙏 Acknowledgements
-FastAPI
-
-PostgreSQL + PostGIS
-
-SQLAlchemy Models & Alembic
-
-Fellow devs and open-source contributors
+FastAPI,PostgreSQL + PostGIS,SQLAlchemy Models & Alembic
+Fellow devs and open-source contributors.
