@@ -2,15 +2,22 @@
 
 A location-based backend service that helps users discover nearby shops (within a 2–5 meter radius) that stock specific items — like “Maggie”, “batteries”, or “coffee sachets” — with real-time availability, quantity, and shop status.
 
-This backend is designed with extensibility, scalability, and modularity in mind — ideal for production-grade deployments as well as developer onboarding.
+This backend is designed with extensibility, scalability, and modularity in mind, and is powered by FastAPI, PostgreSQL with PostGIS, and Typesense for lightning-fast, typo-tolerant geo-search.
+
+
 
 ---
 ✨ Features
 ⚡ Fast Geo-Search API: Powered by Typesense, find shops within a given radius that stock a specific item.
+
 🛒 Real-Time Inventory Tracking: Per shop, per item, with real-time quantity updates.
+
 📍 Accurate Spatial Queries: Uses PostGIS for storing and managing location data.
+
 🧾 Modular API Structure: RESTful and versioned (/api/v1) for clean separation of concerns.
+
 🔐 Cookie-based Authentication: Secure, optional login for users and mandatory authentication for shop owners.
+
 🐳 Fully Containerized: The entire stack, including the database and search engine, is managed with Docker for a consistent development environment.
 
 ---
