@@ -28,6 +28,7 @@ sqlmodel==0.0.24
 starlette==0.47.1
 typing-inspection==0.4.1
 typing_extensions==4.14.1
+typesense==1.1.1
 tzdata==2025.2
 ua-parser==1.0.1
 ua-parser-builtins==0.18.0.post1

@@ -8,6 +8,8 @@ from app.db.session import DB
 from app.helpers.helpers import get_fastApi_req_data, recursive_to_str, send_json_response
 from app.helpers.geo import create_point_geometry, geometry_to_latlon
 import warnings
+import typesense
+from app.core.typesense_client import get_typesense_client
 
 
 db = DB()
@@ -20,7 +22,7 @@ class SDB:
         pass
 
     @staticmethod
-    async def create_shop(request: Request, data: ShopCreate, db_pool: Session):
+    async def create_shop(request: Request, data: ShopCreate, db_pool: Session, ts_client: typesense.Client):
         try:
             apiData = await get_fastApi_req_data(request)
             exists = await DB.get_attr_all(dbClassNam=ShopTableEnum.SHOP, db_pool=db_pool, filters={"shopName": data.shopName}, all=False)
@@ -43,6 +45,21 @@ class SDB:
             inserted_shop, ok = await DB.insert(dbClassNam=ShopTableEnum.SHOP, data=shop_data, db_pool=db_pool)
             if not ok or not inserted_shop:
                 return send_json_response(message="Could not create shop", status=status.HTTP_500_INTERNAL_SERVER_ERROR, body={})
+            
+            db_pool.commit()
+
+            # --- TYPESENSE INDEXING ---
+            try:
+                shop_document = {
+                    'id': str(inserted_shop.shop_id),
+                    'name': inserted_shop.shopName,
+                    'address': inserted_shop.address,
+                    'location': [data.latitude, data.longitude]
+                }
+                ts_client.collections['shops'].documents.create(shop_document)
+            except Exception as e:
+                print(f"Error indexing shop {inserted_shop.shop_id} in Typesense: {e}")
+            # --- END TYPESENSE ---
 
             shop_dict = inserted_shop.model_dump(exclude={"location", "shop_id"})
             latlon = geometry_to_latlon(inserted_shop.location)
@@ -52,16 +69,14 @@ class SDB:
             shop_dict.pop("shop_id", None)
             shop_dict.pop("owner_id", None)
 
-
-            db_pool.commit()
-
             return send_json_response(message="Shop created successfully", status=status.HTTP_201_CREATED, body=shop_dict)
         except Exception as e:
+            db_pool.rollback()
             traceback.print_exc()
             return send_json_response(message="Error creating shop", status=status.HTTP_500_INTERNAL_SERVER_ERROR, body={})
 
     @staticmethod
-    async def update_shop(request: Request, data: ShopUpdate, db_pool: Session):
+    async def update_shop(request: Request, data: ShopUpdate, db_pool: Session, ts_client: typesense.Client):
         try:
             update_data = data.model_dump(exclude_unset=True)
             if not data.shop_id:
@@ -71,17 +86,11 @@ class SDB:
             if not shop_obj:
                 return send_json_response(message="Shop not found.", status=status.HTTP_404_NOT_FOUND)
 
-            #TODO
-            # current_user = getattr(request.state, "emp", None)
-            # if not current_user or shop_obj.owner_id != current_user.pk:
-            #     return send_json_response(message="You do not have permission to update this shop.", status=status.HTTP_403_FORBIDDEN)
-
+            lat, lon = data.latitude, data.longitude
             if "latitude" in update_data and "longitude" in update_data:
-                lat = update_data.pop("latitude")
-                lon = update_data.pop("longitude")
                 update_data["location"] = create_point_geometry(lat, lon)
 
-            for field in ["shop_id", "owner_id"]:
+            for field in ["shop_id", "owner_id", "latitude", "longitude"]:
                 update_data.pop(field, None)
 
             if not update_data:
@@ -94,7 +103,25 @@ class SDB:
                 identifier={"shop_id": data.shop_id}
             )
             if not success:
-                return send_json_response(message=message, status=status.HTTP_200_OK if "no update" in message.lower() else status.HTTP_400_BAD_REQUEST)
+                return send_json_response(message=message, status=status.HTTP_400_BAD_REQUEST)
+
+            db_pool.commit()
+
+            # --- TYPESENSE UPDATE ---
+            try:
+                ts_document = {}
+                if 'shopName' in update_data:
+                    ts_document['name'] = update_data['shopName']
+                if 'address' in update_data:
+                    ts_document['address'] = update_data['address']
+                if 'location' in update_data:
+                    ts_document['location'] = [lat, lon]
+                
+                if ts_document:
+                    ts_client.collections['shops'].documents[str(data.shop_id)].update(ts_document)
+            except Exception as e:
+                print(f"Error updating shop {data.shop_id} in Typesense: {e}")
+            # --- END TYPESENSE ---
 
             updated_shop = await DB.get_attr_all(dbClassNam=ShopTableEnum.SHOP, db_pool=db_pool, filters={"shop_id": data.shop_id}, all=False)
             shop_dict = updated_shop.model_dump(exclude={"location"}) if updated_shop else {}
@@ -103,8 +130,6 @@ class SDB:
                 shop_dict = recursive_to_str(shop_dict)
 
             return send_json_response(message="Shop updated successfully", status=status.HTTP_200_OK, body=shop_dict)
-
-
         except Exception as e:
             if db_pool:
                 db_pool.rollback()
@@ -158,21 +183,35 @@ class SDB:
 
 
     @staticmethod
-    async def delete_shop(request: Request, shop_id: str, db_pool):
+    async def delete_shop(request: Request, shop_id: str, db_pool: Session, ts_client: typesense.Client):
         try:
+            shop_id_val = str(shop_id)
             shop = await db.get_attr_all(dbClassNam=ShopTableEnum.SHOP, db_pool=db_pool, filters={"shop_id": shop_id_val}, all=False)
             if not shop:
                 return send_json_response(message="Shop not found", status=status.HTTP_404_NOT_FOUND, body={})
+            
             shop_dict = shop.model_dump(exclude={"location"})
             if shop.location:
                 shop_dict.update(geometry_to_latlon(shop.location))
             shop_dict.pop("shop_id", None)
             shop_dict = recursive_to_str(shop_dict)
+
             message, success = await DB.delete_attr(dbClassNam=ShopTableEnum.SHOP, db_pool=db_pool, identifier={"shop_id": shop_id_val})
             if not success:
                 return send_json_response(message=message, status=status.HTTP_500_INTERNAL_SERVER_ERROR, body={})
+            
+            db_pool.commit()
+
+            # --- TYPESENSE DELETE ---
+            try:
+                ts_client.collections['shops'].documents[shop_id_val].delete()
+            except Exception as e:
+                 print(f"Error deleting shop {shop_id_val} from Typesense: {e}")
+            # --- END TYPESENSE ---
+
             return send_json_response(message="Shop deleted successfully", status=status.HTTP_200_OK, body=shop_dict)
         except Exception as e:
+            db_pool.rollback()
             traceback.print_exc()
             return send_json_response(message="Error deleting shop", status=status.HTTP_500_INTERNAL_SERVER_ERROR, body={})
 

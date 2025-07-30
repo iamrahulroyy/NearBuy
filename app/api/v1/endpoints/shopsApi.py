@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, Request
+import typesense
 from app.api.v1.endpoints.functions.shops import SDB
+from app.core.typesense_client import get_typesense_client
 from app.db.models.user import UserRole
 from app.db.schemas.shop import ShopCreate, ShopUpdate
 from app.db.session import DataBasePool, authentication_required
@@ -10,13 +12,13 @@ sdb = SDB()
 
 @shop_router.post("/create_shop")
 @authentication_required([UserRole.VENDOR, UserRole.ADMIN])
-async def create_shop_endpoint(request: Request, data: ShopCreate, db_pool=Depends(DataBasePool.get_pool)):
-    return await sdb.create_shop(request, data, db_pool)
+async def create_shop_endpoint(request: Request, data: ShopCreate, db_pool=Depends(DataBasePool.get_pool),ts_client: typesense.Client = Depends(get_typesense_client) ):
+    return await sdb.create_shop(request, data, db_pool,ts_client)
 
 @shop_router.patch("/update_shop")
 @authentication_required([UserRole.VENDOR,UserRole.ADMIN])
-async def update_shop_endpoint(request: Request, data: ShopUpdate, db_pool=Depends(DataBasePool.get_pool)):
-    return await sdb.update_shop(request, data, db_pool)
+async def update_shop_endpoint(request: Request, data: ShopUpdate, db_pool=Depends(DataBasePool.get_pool),ts_client: typesense.Client = Depends(get_typesense_client)):
+    return await sdb.update_shop(request, data, db_pool, ts_client)
 
 @shop_router.get("/view_shop")
 @authentication_required([UserRole.USER,UserRole.VENDOR,UserRole.ADMIN,UserRole.STATE_CONTRIBUTER])
@@ -30,6 +32,6 @@ async def get_shop_endpoint(request: Request, shop_id: str, db_pool=Depends(Data
 
 @shop_router.delete("/{shop_id}")
 @authentication_required([UserRole.ADMIN])
-async def delete_shop_endpoint(request: Request, shop_id: str, db_pool=Depends(DataBasePool.get_pool)):
-    return await sdb.delete_shop(request, shop_id, db_pool)
+async def delete_shop_endpoint(request: Request, shop_id: str, db_pool=Depends(DataBasePool.get_pool),ts_client: typesense.Client = Depends(get_typesense_client)):
+    return await sdb.delete_shop(request, shop_id, db_pool, ts_client)
 
