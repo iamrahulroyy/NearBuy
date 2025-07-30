@@ -5,14 +5,6 @@ A location-based backend service that helps users discover nearby shops (within 
 This backend is designed with extensibility, scalability, and modularity in mind — ideal for production-grade deployments as well as developer onboarding.
 
 ---
-
-##Of course. Here is the updated README.md that reflects the integration of Typesense and the new geo-search endpoint.
-
-🧭 Hyperlocal Shop Finder – Backend
-A location-based backend service that helps users discover nearby shops that stock specific items—like “Maggie,” “batteries,” or “coffee sachets”—with real-time availability, quantity, and shop status.
-
-This backend is designed with extensibility, scalability, and modularity in mind, and is powered by FastAPI, PostgreSQL with PostGIS, and Typesense for lightning-fast, typo-tolerant geo-search.
-
 ✨ Features
 ⚡ Fast Geo-Search API: Powered by Typesense, find shops within a given radius that stock a specific item.
 🛒 Real-Time Inventory Tracking: Per shop, per item, with real-time quantity updates.
