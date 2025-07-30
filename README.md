@@ -8,6 +8,7 @@ This backend is designed with extensibility, scalability, and modularity in mind
 
 ---
 ✨ Features
+
 ⚡ Fast Geo-Search API: Powered by Typesense, find shops within a given radius that stock a specific item.
 
 🛒 Real-Time Inventory Tracking: Per shop, per item, with real-time quantity updates.
