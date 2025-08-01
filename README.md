@@ -2,19 +2,24 @@
 
 A location-based backend service that helps users discover nearby shops (within a 2–5 meter radius) that stock specific items — like “Maggie”, “batteries”, or “coffee sachets” — with real-time availability, quantity, and shop status.
 
-This backend is designed with extensibility, scalability, and modularity in mind — ideal for production-grade deployments as well as developer onboarding.
+This backend is designed with extensibility, scalability, and modularity in mind, and is powered by FastAPI, PostgreSQL with PostGIS, and Typesense for lightning-fast, typo-tolerant geo-search.
+
+
 
 ---
+✨ Features
 
-## ✨ Features
+⚡ Fast Geo-Search API: Powered by Typesense, find shops within a given radius that stock a specific item.
 
-- **Geo-based Search API** — find shops within 2–5m that stock an item.
-- **Inventory Tracking** — per shop, per item, with real-time quantity updates.
-- **PostGIS Spatial Queries** — accurate distance-based shop lookup.
-- **Modular API Structure** — RESTful and versioned (`/api/v1`).
-- **Cookie-based Auth** — optional login for users, mandatory for shop owners.
-- **Clean Architecture** — with layered services, reusable schema, and test coverage.
-- **Docker-Ready** — includes dev containers with PostgreSQL + PostGIS.
+🛒 Real-Time Inventory Tracking: Per shop, per item, with real-time quantity updates.
+
+📍 Accurate Spatial Queries: Uses PostGIS for storing and managing location data.
+
+🧾 Modular API Structure: RESTful and versioned (/api/v1) for clean separation of concerns.
+
+🔐 Cookie-based Authentication: Secure, optional login for users and mandatory authentication for shop owners.
+
+🐳 Fully Containerized: The entire stack, including the database and search engine, is managed with Docker for a consistent development environment.
 
 ---
 
@@ -27,8 +32,7 @@ This backend is designed with extensibility, scalability, and modularity in mind
 | POST   | `/users/signup/contributor`   | Register a new contributor. |
 | POST   | `/users/login`                | Cookie-based login for all user types. |
 | POST   | `/users/logout`               | Logout and clear the session. |
-| GET    | `/search/shops`               | Search for shops by name. |
-| GET    | `/search/items`               | Search for items by name or description. |
+| GET	    | `/search/nearby`	           |The primary search endpoint. Finds items in shops near a given latitude and longitude.|
 | POST   | `/shops/create_shop`          | Create a shop (requires vendor or admin auth). |
 | GET    | `/shops/{shop_id}`            | Get shop details. |
 | PATCH  | `/shops/update_shop`          | Update shop details (requires vendor or admin auth). |
@@ -54,7 +58,7 @@ NEARBUY/
 │ └── tests/ # Unit & integration tests
 ├── scripts/ # Seeders, spatial test scripts
 ├── alembic/ # DB migrations
-├── docker-compose.yml # Dev stack (FastAPI + PostGIS)
+├── docker-compose.yml # Dev stack (FastAPI + PostGIS + Typesense)
 ├── Dockerfile
 ├── .env # App config
 └── README.md
@@ -94,12 +98,11 @@ docker-compose exec backend pytest
 ```
 
 🔮 Roadmap
-
-Add email/password recovery
-Admin dashboard for shop owners
-Caching layer (Redis) for heavy search traffic
-WebSocket or long polling for real-time stock updates
-QR-based shop linking for instant scan & find
+Admin Dashboard: A simple interface for shop owners to manage their inventory.
+Caching Layer: Implement Redis for caching frequently accessed data.
+Notification : Kafka and websocket
+Real-Time Updates: Use WebSockets for live stock updates.
+QR Code Integration: Allow users to quickly find a shop by scanning a QR code.
 
 
 🤝 Contributing
