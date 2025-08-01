@@ -7,11 +7,11 @@ from app.api.v1.endpoints.shopsApi import shop_router
 from app.api.v1.endpoints.itemsApi import item_router 
 from app.api.v1.endpoints.inventoryApi import inventory_router 
 from app.api.v1.endpoints.searchApi import search_router 
-from app.api.v1.endpoints.statusApi import status_router 
-from app.core.typesense_client import create_collections
+from app.api.v1.endpoints.statusApi import status_router
+from typesense_utils.typesense_client import create_collections 
 
 
-port = 8050
+port = 8059
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

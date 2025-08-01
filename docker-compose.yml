@@ -9,10 +9,16 @@ services:
       - .:/app
     depends_on:
       db:
-        condition: service_healthy  # ✅ wait until DB is ready
+        condition: service_healthy
+      typesense:
+        condition: service_started
     environment:
-      - DATABASE_URL=postgresql://postgres:1234@db:5432/shopfinder
+      - DATABASE_URL=postgresql://postgres:1234@db:5432/shopfinderdocker
       - COOKIE_KEY=shopNear_
+      - TYPESENSE_HOST=typesense
+      - TYPESENSE_PORT=8108
+      - TYPESENSE_PROTOCOL=http
+      - TYPESENSE_API_KEY=xyz
 
   db:
     image: postgis/postgis:13-3.1
@@ -24,11 +30,23 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=1234
       - POSTGRES_DB=shopfinderdocker
-    healthcheck:  # ✅ this ensures the DB is fully started before backend tries to connect
+    healthcheck:
       test: ["CMD", "pg_isready", "-U", "postgres"]
       interval: 5s
       timeout: 5s
       retries: 5
 
+  typesense:
+    image: typesense/typesense:0.24.1
+    ports:
+      - "8108:8108"
+    command: >
+      --data-dir /data
+      --api-key=xyz
+      --enable-cors
+    volumes:
+      - typesense_data:/data
+
 volumes:
   postgres_data:
+  typesense_data:

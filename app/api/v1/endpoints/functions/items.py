@@ -70,9 +70,11 @@ class IDB:
             try:
                 item_document = {
                     'id': str(inserted_item.id),
-                    'name': inserted_item.itemName,
+                    'shop_id': str(inserted_item.shop_id),
+                    'itemName': inserted_item.itemName,
+                    'price': inserted_item.price,
                     'description': inserted_item.description,
-                    'shop_id': str(inserted_item.shop_id)
+                    'note': inserted_item.note,
                 }
                 ts_client.collections['items'].documents.create(item_document)
             except Exception as e:

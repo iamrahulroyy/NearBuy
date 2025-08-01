@@ -11,6 +11,7 @@ class ShopTableEnum(str, Enum):
     SHOP = "SHOP"
 
 class SHOP(SQLModel, table=True):
+    __tablename__ = "shop"
     shop_id: Optional[uuid.UUID] = Field(
         default_factory=uuid.uuid4,
         primary_key=True,

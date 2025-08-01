@@ -1,11 +1,12 @@
 import traceback
 from fastapi import APIRouter, Depends, HTTPException, Request, Query
 import typesense
-from app.core.typesense_client import get_typesense_client
+import typesense_utils
 from app.db.session import DataBasePool, authentication_required
 from app.db.models.user import UserRole
 from app.helpers.helpers import send_json_response
 from app.api.v1.endpoints.functions.search import SearchDB
+from typesense_utils.typesense_client import get_typesense_client
 
 search_router = APIRouter(prefix="/search", tags=["Search"])
 searchdb = SearchDB()
