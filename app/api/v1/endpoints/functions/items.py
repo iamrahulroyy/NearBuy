@@ -9,6 +9,7 @@ from app.db.models.shop import ShopTableEnum
 from app.db.models.user import UserRole, UserTableEnum
 from app.db.schemas.item import ItemCreate, ItemUpdate
 from app.db.session import DB
+from app.db.table_map import TABLE_CLASS_MAP
 from app.helpers.helpers import get_fastApi_req_data, send_json_response
 
 
@@ -99,20 +100,36 @@ class IDB:
 
 
     @staticmethod
-    async def get_all_items(request: Request, db_pool: Session):
+    async def get_all_items(request: Request, db_pool: Session, page: int = 1, page_size: int = 20):
         try:
-            items = await db.get_attr_all(dbClassNam=ItemTableEnum.ITEM, db_pool=db_pool, all=True)
+            offset = (page - 1) * page_size
+            model_class = TABLE_CLASS_MAP[ItemTableEnum.ITEM]
+            items, total_count = await db.get_attr_all_paginated(dbClassNam=model_class,db_pool=db_pool,offset=offset,limit=page_size)
+
             if items is None:
-                return send_json_response(message="Error retrieving items", status=status.HTTP_500_INTERNAL_SERVER_ERROR, body={})
-            
-            serialized_items = [{k: v for k, v in item.items() if k != 'id'} for item in jsonable_encoder(items)] if items else []
+                return send_json_response(message="Error retrieving items",status=status.HTTP_500_INTERNAL_SERVER_ERROR,body={})
 
-            return send_json_response(message="Items retrieved successfully", status=status.HTTP_200_OK, body=serialized_items)
+            serialized_items = [
+                {k: v for k, v in item.items() if k != 'id'}
+                for item in jsonable_encoder(items)
+            ] if items else []
+
+            response_body = {
+                "data": serialized_items,
+                "pagination": {
+                    "page": page,
+                    "page_size": page_size,
+                    "total": total_count,
+                    "pages": (total_count + page_size - 1) // page_size
+                }
+            }
+
+            return send_json_response(message="Items retrieved successfully",status=status.HTTP_200_OK,body=response_body)
+        
         except Exception as e:
-            print("Exception caught at get_all_items: ", str(e))
+            print("Exception caught at get_all_items:", str(e))
             traceback.print_exc()
-            return send_json_response(message="Error retrieving items", status=status.HTTP_500_INTERNAL_SERVER_ERROR, body={})
-
+            return send_json_response(message="Error retrieving items",status=status.HTTP_500_INTERNAL_SERVER_ERROR,body={})
 
     @staticmethod
     async def get_item(request: Request, itemName: str, db_pool: Session):

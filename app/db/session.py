@@ -1,9 +1,10 @@
 from functools import wraps
 import time
 import traceback
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from fastapi import Request,status
-from sqlmodel import SQLModel, Session, create_engine, delete, select
+from fastapi.encoders import jsonable_encoder
+from sqlmodel import SQLModel, Session, create_engine, delete, func, select
 from app.db.models.inventory import INVENTORY, InventoryTableEnum
 from app.db.models.item import ITEM, ItemTableEnum
 from app.db.models.shop import SHOP, ShopTableEnum
@@ -309,6 +310,34 @@ class DB:
             traceback.print_exc()
             message = "Error deleting."
             return message, False
+
+    @classmethod  
+    async def get_attr_all_paginated(cls,dbClassNam,db_pool,offset: int = 0,limit: int = 20,filters: Optional[List] = None,order_by: Optional[List] = None) -> Tuple[List[dict], int]:
+        try:
+            session = db_pool
+            query = select(dbClassNam)
+            count_query = select(func.count()).select_from(dbClassNam)
+
+            if filters:
+                for f in filters:
+                    query = query.where(f)
+                    count_query = count_query.where(f)
+
+            if order_by:
+                query = query.order_by(*order_by)
+
+            query = query.offset(offset).limit(limit)
+            result = session.execute(query)
+            rows = result.scalars().all()
+
+            count_result = session.execute(count_query)
+            total_count = count_result.scalar_one()
+
+            return [jsonable_encoder(row) for row in rows], total_count
+        except Exception as e:
+            print("Exception in get_attr_all_paginated:", str(e))
+            traceback.print_exc()
+            return [], 0
 
 
 # def authentication_required(func):

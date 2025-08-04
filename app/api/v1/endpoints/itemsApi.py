@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Query, Request
 import typesense
 from app.api.v1.endpoints.functions.items import IDB
 from app.db.models.user import UserRole
@@ -17,8 +17,8 @@ async def add_item_endpoint(request: Request, data: ItemCreate, db_pool=Depends(
 
 @item_router.get("/get_all_items")
 @authentication_required([UserRole.VENDOR, UserRole.ADMIN, UserRole.USER, UserRole.STATE_CONTRIBUTER])
-async def get_all_items_endpoint(request: Request, db_pool=Depends(DataBasePool.get_pool)):
-    return await idb.get_all_items(request, db_pool)
+async def get_all_items_endpoint(request: Request,db_pool=Depends(DataBasePool.get_pool),page: int = Query(1, gt=0),page_size: int = Query(20, gt=0, le=100)):
+    return await idb.get_all_items(request, db_pool, page, page_size)
 
 @item_router.get("/get_item/{itemName}")
 @authentication_required([UserRole.VENDOR, UserRole.ADMIN, UserRole.USER, UserRole.STATE_CONTRIBUTER])
