@@ -1,20 +1,12 @@
 import uuid
 import time
-import random
-from sqlmodel import Session
+from sqlmodel import Session, select
 from app.db.models.shop import SHOP
 from app.db.models.item import ITEM
-from app.db.models.inventory import INVENTORY, StockStatus  
+from app.db.models.user import USER, UserRole
 from app.db.session import DataBasePool
-
-def real_address():
-    return random.choice([
-        "12 Linking Road, Mumbai",
-        "45 Church Street, Bengaluru",
-        "18 Camac Street, Kolkata",
-        "90 Janpath Road, Delhi",
-        "34 Jubilee Hills, Hyderabad"
-    ])
+from app.helpers.loginHelper import security
+from app.helpers.geo import create_point_geometry
 
 async def setup_db():
     await DataBasePool.setup()
@@ -22,97 +14,71 @@ async def setup_db():
 def run():
     db_pool = DataBasePool._db_pool
     if db_pool is None:
-        print("No db pool! Init your DB first.")
+        print("Database pool is not initialized.")
         return
 
-    shop_uuid = uuid.uuid4()
-    item_uuid = uuid.uuid4()
-    inventory_uuid = str(uuid.uuid4())
+    # --- Use the IDs you provided ---
+    owner_id = uuid.UUID("3e592b3b-5064-4ff5-9fcf-2bf8382972fe")
+    shop_id = uuid.UUID("07446c46-7775-4c99-a29e-79843fb69f93")
+    vendor_email = "anita.verma@vermahandicrafts.com"
 
-    # Create a realistic shop
-    shop = SHOP(
-        shop_id=shop_uuid,
-        owner_id=uuid.UUID("7ad811a9-2cea-4980-9e2f-fc86dc99ad29"),
-        fullName="Ravi Sharma",
-        shopName="FreshMart Grocery",
-        address=real_address(),
-        contact="982307" + str(random.randint(1000, 9999)),
-        description="A modern grocery store offering fresh produce and daily essentials.",
-        is_open=True,
-        location=None,
-        created_at=int(time.time()),
-        note="Inserted by setup script"
-    )
+    # --- 1. Create or Find the Vendor User ---
+    statement = select(USER).where(USER.id == owner_id)
+    existing_user = db_pool.exec(statement).first()
+    if not existing_user:
+        vendor_user = USER(id=owner_id, email=vendor_email, password=security().hash_password("Anita@2024"), fullName="Anita Verma", role=UserRole.VENDOR)
+        db_pool.add(vendor_user)
+        print(f"Creating vendor user: {vendor_email}")
+    else:
+        print(f"Found existing vendor user: {vendor_email}")
 
-    # Create a realistic item
-    item_price = round(random.uniform(150, 250), 2)
-    item = ITEM(
-        id=item_uuid,
-        itemName="Organic Basmati Rice",
-        price=item_price,
-        description="Premium quality, aged basmati rice ideal for daily meals.",
-        note="Added via initialization script"
-    )
-
-    with db_pool:
-        # Add and flush shop & item
-        db_pool.add(shop)
-        db_pool.add(item)
-        db_pool.flush()  # Required to insert SHOP and ITEM before referencing in INVENTORY
-
-        # Insert inventory
-        inventory = INVENTORY(
-            inventory_id=inventory_uuid,
-            shop_id=shop_uuid,
-            item_id=item_uuid,
-            quantity=random.randint(15, 40),
-            price_at_entry=item_price,
-            last_restocked_at=int(time.time()),
-            min_quantity=5,
-            max_quantity=100,
-            status=StockStatus.IN_STOCK,
-            location="Back Shelf A3",
-            batch_number="BATCH" + str(random.randint(1000, 9999)),
-            expiry_date=int(time.time()) + 60 * 60 * 24 * 180,  # 6 months later
-            updated_at=int(time.time()),
-            note="Initial stock added via script"
+    # --- 2. Create or Update the Shop with Location ---
+    statement = select(SHOP).where(SHOP.shop_id == shop_id)
+    existing_shop = db_pool.exec(statement).first()
+    
+    # Define the location point
+    shop_location = create_point_geometry(latitude=20.2961, longitude=85.8245)
+    
+    if not existing_shop:
+        shop = SHOP(
+            shop_id=shop_id,
+            owner_id=owner_id,
+            fullName="Anita Verma",
+            shopName="Verma Handicrafts",
+            address="45 MG Road, Sector 14, Gurugram, Haryana",
+            contact="+91-9811122233",
+            description="Authentic Indian handicrafts and textiles.",
+            is_open=True,
+            location=shop_location # Set location on creation
         )
+        db_pool.add(shop)
+        print(f"Creating shop: {shop.shopName} with location.")
+    else:
+        # If shop exists, UPDATE its location
+        existing_shop.location = shop_location
+        db_pool.add(existing_shop)
+        print(f"Found existing shop. Updating location for: {existing_shop.shopName}")
 
-        db_pool.add(inventory)
-        db_pool.commit()
+    # --- 3. Create or Find an Item for the Shop ---
+    item_name = "Hand-painted Silk Scarf"
+    statement = select(ITEM).where(ITEM.itemName == item_name, ITEM.shop_id == shop_id)
+    existing_item = db_pool.exec(statement).first()
+    if not existing_item:
+        item = ITEM(id=uuid.uuid4(), shop_id=shop_id, itemName=item_name, price=1250.00, description="A beautiful, one-of-a-kind silk scarf.")
+        db_pool.add(item)
+        print(f"Creating item: {item.itemName}")
+    else:
+        print(f"Found existing item: {existing_item.itemName}")
 
-        db_pool.refresh(shop)
-        db_pool.refresh(item)
-        db_pool.refresh(inventory)
+    # --- 4. Commit to Database ---
+    db_pool.commit()
+    print("\n--- Seeding Complete! ---")
+    print("User, Shop, and Item are now correctly configured in the database.")
+    print("-------------------------\n")
 
-    print("Inserted shop:", shop.shop_id, shop.fullName)
-    print("Inserted item:", item.id, item.itemName)
-    print("Inserted inventory:", inventory.inventory_id, f"{inventory.quantity} units at ₹{inventory.price_at_entry}")
 
 if __name__ == "__main__":
     import asyncio
+    print("Starting database seeding...")
     asyncio.run(setup_db())
     run()
-
-# ------------------- fake_data -------------------
-# {
-#   "fullName": "Neha Singh",
-#   "email": "neha.singh@govstatsportal.in",
-#   "password": "Neha@2024",
-#   "role": "STATE_CONTRIBUTER"
-# }
-# {
-#   "fullName": "Karan Mehta",
-#   "email": "karan.mehta@examplemail.com",
-#   "password": "Karan@1234",
-#   "role": "USER"
-# }
-# {
-#   "fullName": "Anita Verma",
-#   "shopName": "Verma Handicrafts",
-#   "address": "45 MG Road, Sector 14, Gurugram, Haryana",
-#   "contact": "+91-9811122233",
-#   "email": "anita.verma@vermahandicrafts.com",
-#   "password": "Anita@2024",
-#   "role": "VENDOR"
-# }

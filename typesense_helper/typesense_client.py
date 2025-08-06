@@ -28,7 +28,8 @@ shops_schema = {
 items_schema = {
     "name": "items",
     "fields": [
-        {"name": "id", "type": "string"},
+        # Changed "id" to "item_id" to avoid conflict with Typesense's reserved "id" field
+        {"name": "item_id", "type": "string"},
         {"name": "shop_id", "type": "string", "facet": True},
         {"name": "itemName", "type": "string"},
         {"name": "description", "type": "string", "optional": True},

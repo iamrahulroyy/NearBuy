@@ -19,6 +19,21 @@ services:
       - TYPESENSE_PORT=8108
       - TYPESENSE_PROTOCOL=http
       - TYPESENSE_API_KEY=xyz
+    command: >
+      sh -c "
+        # Wait for the database to be ready
+        until pg_isready -h db -p 5432 -U postgres; do
+          echo 'Waiting for database...'
+          sleep 2
+        done
+        # Wait for Typesense to be ready
+        until curl -f http://typesense:8108/health; do
+          echo 'Waiting for Typesense...'
+          sleep 2
+        done
+        # Run the main application
+        uvicorn main:app --host 0.0.0.0 --port 8050 --reload
+      "
 
   db:
     image: postgis/postgis:13-3.1

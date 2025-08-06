@@ -34,3 +34,4 @@ ua-parser==1.0.1
 ua-parser-builtins==0.18.0.post1
 uvicorn==0.35.0
 numpy==1.26.4
+alembic
