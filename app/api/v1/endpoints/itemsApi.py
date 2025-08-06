@@ -4,7 +4,7 @@ from app.api.v1.endpoints.functions.items import IDB
 from app.db.models.user import UserRole
 from app.db.schemas.item import ItemCreate, ItemUpdate
 from app.db.session import DataBasePool, authentication_required
-from typesense_utils.typesense_client import get_typesense_client
+from typesense_helper.typesense_client import get_typesense_client
 
 
 item_router = APIRouter(prefix="/items", tags=["Items"])

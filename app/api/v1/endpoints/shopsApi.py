@@ -4,7 +4,7 @@ from app.api.v1.endpoints.functions.shops import SDB
 from app.db.models.user import UserRole
 from app.db.schemas.shop import ShopCreate, ShopUpdate
 from app.db.session import DataBasePool, authentication_required
-from typesense_utils.typesense_client import get_typesense_client
+from typesense_helper.typesense_client import get_typesense_client
 
 
 shop_router = APIRouter(prefix="/shops", tags=["Shops"])

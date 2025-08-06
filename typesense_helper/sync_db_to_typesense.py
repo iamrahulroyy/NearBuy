@@ -1,7 +1,7 @@
 from sqlmodel import Session, create_engine, select
 from app.db.models.shop import SHOP
 from app.db.models.item import ITEM
-from typesense_utils.typesense_client import get_typesense_client, create_collections
+from typesense_helper.typesense_client import get_typesense_client, create_collections
 from app.helpers.variables import DATABASE_URL
 from app.helpers.geo import geometry_to_latlon
 

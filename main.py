@@ -8,7 +8,7 @@ from app.api.v1.endpoints.itemsApi import item_router
 from app.api.v1.endpoints.inventoryApi import inventory_router 
 from app.api.v1.endpoints.searchApi import search_router 
 from app.api.v1.endpoints.statusApi import status_router
-from typesense_utils.typesense_client import create_collections 
+from typesense_helper.typesense_client import create_collections 
 
 
 port = 8059
