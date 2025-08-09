@@ -1,7 +1,9 @@
+import json
 import traceback
 import uuid
 from fastapi import Request,status
 from fastapi.encoders import jsonable_encoder
+import redis
 from sqlmodel import Session
 import typesense
 from app.db.models.item import ItemTableEnum
@@ -20,7 +22,7 @@ class IDB:
         pass
 
     @staticmethod
-    async def add_item(request: Request, data: ItemCreate, db_pool: Session, ts_client: typesense.Client):
+    async def add_item(request: Request, data: ItemCreate, db_pool: Session, ts_client: typesense.Client, redis_client: redis.Redis):
         try:
             apiData = await get_fastApi_req_data(request)
             if not apiData:
@@ -66,6 +68,7 @@ class IDB:
                 return send_json_response(message="Could not create item", status=status.HTTP_500_INTERNAL_SERVER_ERROR, body={})
             
             db_pool.commit()
+            db_pool.refresh(inserted_item)
 
             # --- TYPESENSE INDEXING ---
             try:
@@ -81,6 +84,11 @@ class IDB:
             except Exception as e:
                 print(f"Error indexing item {inserted_item.id} in Typesense: {e}")
             # --- END TYPESENSE ---
+
+            # --- CACHE INVALIDATION ---
+            # redis_client.delete("all_items_cache")
+            for key in redis_client.keys("all_items:*"):
+                redis_client.delete(key)
 
             serialized_item = jsonable_encoder(inserted_item)
             serialized_item.pop("id", None)
@@ -100,8 +108,13 @@ class IDB:
 
 
     @staticmethod
-    async def get_all_items(request: Request, db_pool: Session, page: int = 1, page_size: int = 20):
+    async def get_all_items(request: Request, db_pool: Session, page: int, page_size: int, redis_client: redis.Redis):
+        cache_key = f"all_items:page_{page}:size_{page_size}"
         try:
+            cached_items = redis_client.get(cache_key)
+            if cached_items:
+                return send_json_response(message="Items retrieved from cache",status=status.HTTP_200_OK,body=json.loads(cached_items))
+            
             offset = (page - 1) * page_size
             model_class = TABLE_CLASS_MAP[ItemTableEnum.ITEM]
             items, total_count = await db.get_attr_all_paginated(dbClassNam=model_class,db_pool=db_pool,offset=offset,limit=page_size)
@@ -123,7 +136,8 @@ class IDB:
                     "pages": (total_count + page_size - 1) // page_size
                 }
             }
-
+            redis_client.set(cache_key, json.dumps(response_body), ex=3600)
+            
             return send_json_response(message="Items retrieved successfully",status=status.HTTP_200_OK,body=response_body)
         
         except Exception as e:
@@ -132,8 +146,13 @@ class IDB:
             return send_json_response(message="Error retrieving items",status=status.HTTP_500_INTERNAL_SERVER_ERROR,body={})
 
     @staticmethod
-    async def get_item(request: Request, itemName: str, db_pool: Session):
+    async def get_item(request: Request, itemName: str, db_pool: Session, redis_client: redis.Redis):
+        cache_key = f"item:{itemName}"
         try:
+            cached_item = redis_client.get(cache_key)
+            if cached_item:
+                return send_json_response(message="Item retrieved from cache",status=status.HTTP_200_OK,body=json.loads(cached_item))
+            
             item = await db.get_attr_all(dbClassNam=ItemTableEnum.ITEM, db_pool=db_pool, filters={"itemName": itemName}, all=False)
             
             if not item:
@@ -141,6 +160,8 @@ class IDB:
             
             # serialized_item = jsonable_encoder(item)
             serialized_item = {k: v for k, v in jsonable_encoder(item).items() if k != 'id'}
+
+            redis_client.set(cache_key, json.dumps(serialized_item), ex=3600)
 
             return send_json_response(message="Item retrieved successfully", status=status.HTTP_200_OK, body=serialized_item)
             
@@ -150,7 +171,7 @@ class IDB:
             return send_json_response(message="Error retrieving item", status=status.HTTP_500_INTERNAL_SERVER_ERROR, body={})
 
     @staticmethod
-    async def update_item(request: Request, data: ItemUpdate, db_pool: Session, ts_client: typesense.Client):
+    async def update_item(request: Request, data: ItemUpdate, db_pool: Session, ts_client: typesense.Client, redis_client: redis.Redis):
         try:
             if not data.itemName or not data.shop_id:
                 return send_json_response(message="Both item name and shop ID are required for update.", status=status.HTTP_403_FORBIDDEN, body={})
@@ -184,6 +205,11 @@ class IDB:
                 return send_json_response(message=message, status=status.HTTP_500_INTERNAL_SERVER_ERROR, body={})
 
             db_pool.commit()
+            # --- CACHE INVALIDATION ---
+            redis_client.delete(f"item:{data.itemName}")
+            # redis_client.delete("all_items_cache")
+            for key in redis_client.keys("all_items:*"):
+                redis_client.delete(key)
 
             # --- TYPESENSE UPDATE ---
             try:
@@ -211,7 +237,7 @@ class IDB:
 
 
     @staticmethod
-    async def delete_item(request: Request, itemName: str, db_pool: Session, ts_client: typesense.Client):
+    async def delete_item(request: Request, itemName: str, db_pool: Session, ts_client: typesense.Client, redis_client: redis.Redis):
         try:
             # Note: Deleting just by name can be ambiguous if multiple shops have the same item name.
             # A better approach would be to require shop_id for deletion.
@@ -231,6 +257,12 @@ class IDB:
                 return send_json_response(message=message, status=status.HTTP_500_INTERNAL_SERVER_ERROR, body={})
             
             db_pool.commit()
+
+            # --- CACHE INVALIDATION ---
+            redis_client.delete(f"item:{itemName}")
+            # redis_client.delete("all_items_cache")
+            for key in redis_client.keys("all_items:*"):
+                redis_client.delete(key)
 
             # --- TYPESENSE DELETE ---
             try:
