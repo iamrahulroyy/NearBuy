@@ -1,10 +1,7 @@
 import traceback
 from fastapi import APIRouter, Depends, HTTPException, Request, Query
 import typesense
-import typesense_helper
-from app.db.session import DataBasePool, authentication_required
-from app.db.models.user import UserRole
-from app.helpers.helpers import send_json_response
+from app.core.limiter import limiter  
 from app.api.v1.endpoints.functions.search import SearchDB
 from typesense_helper.typesense_client import get_typesense_client
 
@@ -22,6 +19,7 @@ searchdb = SearchDB()
 #     return await searchdb.search_items(request, q, db_pool)
 
 @search_router.get("/nearby", description="Search for items available in shops near a specific location.")
+@limiter.limit("30/minute")
 def search_nearby_endpoint(
     request: Request,
     q: str = Query(..., description="The item you are searching for (e.g., 'coffee', 'batteries').", min_length=1),

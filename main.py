@@ -2,6 +2,9 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from sqlmodel import SQLModel
 from app.api.v1.endpoints.usersApi import user_router
+from app.core.limiter import limiter 
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 from app.db.session import DataBasePool 
 from app.api.v1.endpoints.shopsApi import shop_router 
 from app.api.v1.endpoints.itemsApi import item_router 
@@ -22,6 +25,9 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.include_router(user_router)
 app.include_router(shop_router)
