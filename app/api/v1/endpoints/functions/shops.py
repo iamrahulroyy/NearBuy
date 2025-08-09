@@ -1,7 +1,10 @@
+import json
 import traceback
 from fastapi import Request,status
 from fastapi.encoders import jsonable_encoder
+import redis
 from sqlmodel import Session
+from RDB import redis_client
 from app.db.models.shop import ShopTableEnum
 from app.db.models.user import UserTableEnum
 from app.db.schemas.shop import ShopCreate, ShopUpdate
@@ -85,7 +88,7 @@ class SDB:
 
     @staticmethod
     async def update_shop(
-        request: Request, data: ShopUpdate, db_pool: Session, ts_client: typesense.Client
+        request: Request, data: ShopUpdate, db_pool: Session, ts_client: typesense.Client, redis_client: redis.Redis
     ):
         try:
             shop_obj = await DB.get_attr_all(
@@ -127,6 +130,8 @@ class SDB:
 
             if success:
                 db_pool.commit()
+                redis_client.delete(f"shop:{data.shop_id}")
+                redis_client.delete(f"shops_by_owner:{shop_obj.owner_id}")
                 if ts_update_doc:
                     try:
                         ts_client.collections["shops"].documents[str(data.shop_id)].update(ts_update_doc)
@@ -147,8 +152,16 @@ class SDB:
             )
 
     @staticmethod
-    async def view_shop(request, owner_id, db_pool):
+    async def view_shop(request, owner_id, db_pool,redis_client: redis.Redis):
+        cache_key = f"shops_by_owner:{owner_id}"
         try:
+            cached_shops = redis_client.get(cache_key)
+            if cached_shops:
+                return send_json_response(
+                    message="Shops retrieved from cache",
+                    status=status.HTTP_200_OK,
+                    body=json.loads(cached_shops)
+                )
             if not owner_id:
                 return send_json_response(message="owner_id is required.", status=status.HTTP_400_BAD_REQUEST, body=[])
             shops = await db.get_attr_all(dbClassNam=ShopTableEnum.SHOP,db_pool=db_pool,filters={"owner_id": owner_id},all=True)
@@ -160,14 +173,27 @@ class SDB:
                 if shop.location:
                     shop_dict.update(geometry_to_latlon(shop.location))
                 result.append(shop_dict)
-            return send_json_response(message="Shops retrieved", status=status.HTTP_200_OK, body=result)
+
+            result_str = recursive_to_str(result)
+            redis_client.set(cache_key, json.dumps(result_str), ex=3600) # Cache for 1 hour
+            
+            return send_json_response(message="Shops retrieved from DATABASE", status=status.HTTP_200_OK, body=result)
         except Exception as e:
             traceback.print_exc()
             return send_json_response(message="Error retrieving shops", status=status.HTTP_500_INTERNAL_SERVER_ERROR, body=[])
 
     @staticmethod
-    async def get_shop(request: Request, shop_id: str, db_pool: Session):
+    async def get_shop(request: Request, shop_id: str, db_pool: Session,redis_client: redis.Redis):
+        cache_key = f"shop:{shop_id}"
         try:
+            cached_shop = redis_client.get(cache_key)
+            if cached_shop:
+                return send_json_response(
+                    message="Shop retrieved from cache",
+                    status=status.HTTP_200_OK,
+                    body=json.loads(cached_shop)
+                )
+
             # shop_id may be UUID (not int)
             shop = await db.get_attr_all(dbClassNam=ShopTableEnum.SHOP, db_pool=db_pool, filters={"shop_id": shop_id}, all=False)
             if not shop:
@@ -181,6 +207,8 @@ class SDB:
             shop_dict.pop("owner_id", None)
 
             shop_dict = recursive_to_str(shop_dict)
+            redis_client.set(cache_key, json.dumps(shop_dict), ex=3600)
+
 
             return send_json_response(message="Shop retrieved",status=status.HTTP_200_OK,body=shop_dict)
         except Exception as e:
@@ -193,7 +221,7 @@ class SDB:
 
 
     @staticmethod
-    async def delete_shop(request: Request, shop_id: str, db_pool: Session, ts_client: typesense.Client):
+    async def delete_shop(request: Request, shop_id: str, db_pool: Session, ts_client: typesense.Client, redis_client: redis.Redis):
         try:
             shop = await DB.get_attr_all(dbClassNam=ShopTableEnum.SHOP, db_pool=db_pool, filters={"shop_id": shop_id}, all=False)
             if not shop:
@@ -203,6 +231,8 @@ class SDB:
 
             if success:
                 db_pool.commit()
+                redis_client.delete(f"shop:{shop_id}")
+                redis_client.delete(f"shops_by_owner:{shop.owner_id}")
                 try:
                     ts_client.collections['shops'].documents[str(shop_id)].delete()
                 except Exception as e:

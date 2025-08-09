@@ -12,6 +12,8 @@ services:
         condition: service_healthy
       typesense:
         condition: service_started
+      redis: 
+        condition: service_started
     environment:
       - DATABASE_URL=postgresql://postgres:1234@db:5432/shopfinderdocker
       - COOKIE_KEY=shopNear_
@@ -19,19 +21,23 @@ services:
       - TYPESENSE_PORT=8108
       - TYPESENSE_PROTOCOL=http
       - TYPESENSE_API_KEY=xyz
+      - REDIS_HOST=redis 
+      - REDIS_PORT=6379   
     command: >
       sh -c "
-        # Wait for the database to be ready
         until pg_isready -h db -p 5432 -U postgres; do
           echo 'Waiting for database...'
           sleep 2
         done
-        # Wait for Typesense to be ready
         until curl -f http://typesense:8108/health; do
           echo 'Waiting for Typesense...'
           sleep 2
         done
-        # Run the main application
+        # Add this block to wait for Redis
+        until redis-cli -h redis -p 6379 ping; do
+          echo 'Waiting for Redis...'
+          sleep 2
+        done
         uvicorn main:app --host 0.0.0.0 --port 8050 --reload
       "
 
@@ -62,6 +68,20 @@ services:
     volumes:
       - typesense_data:/data
 
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck: 
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+
 volumes:
   postgres_data:
   typesense_data:
+  redis_data:
