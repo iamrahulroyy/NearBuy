@@ -37,3 +37,6 @@ numpy==1.26.4
 alembic
 redis
 slowapi
+pytest
+pytest-asyncio
+httpx

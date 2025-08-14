@@ -4,7 +4,6 @@ from fastapi import Request,status
 from fastapi.encoders import jsonable_encoder
 import redis
 from sqlmodel import Session
-from RDB import redis_client
 from app.db.models.shop import ShopTableEnum
 from app.db.models.user import UserTableEnum
 from app.db.schemas.shop import ShopCreate, ShopUpdate
