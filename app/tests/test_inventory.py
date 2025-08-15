@@ -27,10 +27,8 @@ mock_shop = SHOP(shop_id=uuid.UUID(TEST_SHOP_ID), owner_id=TEST_OWNER_ID, shopNa
 mock_item = ITEM(id=uuid.UUID(TEST_ITEM_ID), shop_id=uuid.UUID(TEST_SHOP_ID), itemName="Testable Widget")
 
 
-# --- Pytest Fixture for the Test Client ---
 @pytest_asyncio.fixture
 async def client():
-    """Manages the app lifecycle for tests."""
     await DataBasePool.setup()
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
         yield c
@@ -40,7 +38,6 @@ async def client():
 
 @pytest.mark.asyncio
 async def test_add_inventory(client: AsyncClient):
-    """Test successfully adding a new inventory record for an item."""
     with patch("app.db.session.DB.getUserSession", new_callable=AsyncMock, return_value=mock_user_session), \
          patch("app.api.v1.endpoints.functions.inventory.db.get_attr_all") as mock_get_attr, \
          patch("app.api.v1.endpoints.functions.inventory.db.insert", new_callable=AsyncMock) as mock_insert, \
@@ -67,15 +64,13 @@ async def test_add_inventory(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_update_inventory(client: AsyncClient):
-    """Test successfully updating an existing inventory record."""
     with patch("app.db.session.DB.getUserSession", new_callable=AsyncMock, return_value=mock_user_session), \
          patch("app.api.v1.endpoints.functions.inventory.db.get_attr_all") as mock_get_attr, \
          patch("app.api.v1.endpoints.functions.inventory.db.update_attr_all", new_callable=AsyncMock) as mock_update:
 
-        # FINAL FIX: Give the original mock record an initial quantity.
         mock_inventory_record = MagicMock(
             shop_id=TEST_SHOP_ID, 
-            quantity=100,  # The "old" quantity
+            quantity=100,  
             spec=["model_dump"], 
             **{"model_dump.return_value": {}}
         )
@@ -88,7 +83,7 @@ async def test_update_inventory(client: AsyncClient):
 
         update_data = {
             "inventory_id": TEST_INVENTORY_ID,
-            "quantity": 95 # The "new" quantity
+            "quantity": 95 
         }
         headers = {"Cookie": "shopNear_=test_session_token"}
         response = await client.patch("/inventory/update", json=update_data, headers=headers)
