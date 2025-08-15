@@ -168,9 +168,11 @@ class SDB:
                 return send_json_response(message="No shop found", status=status.HTTP_404_NOT_FOUND, body=[])
             result = []
             for shop in shops:
-                shop_dict = shop.model_dump(exclude={"location", "shop_id", "owner_id"})
+                # shop_dict = shop.model_dump(exclude={"location", "shop_id", "owner_id"})
+                shop_dict = jsonable_encoder(shop)
                 if shop.location:
                     shop_dict.update(geometry_to_latlon(shop.location))
+                shop_dict.pop("location", None)
                 result.append(shop_dict)
 
             result_str = recursive_to_str(result)
@@ -198,7 +200,7 @@ class SDB:
             if not shop:
                 return send_json_response(message="Shop not found",status=status.HTTP_404_NOT_FOUND,body={})
 
-            shop_dict = shop.model_dump()
+            shop_dict = jsonable_encoder(shop)
             latlon = geometry_to_latlon(shop.location)
             shop_dict.update(latlon)
             shop_dict.pop("location", None)
