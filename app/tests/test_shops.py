@@ -1,6 +1,6 @@
 import pytest
 import pytest_asyncio
-import uuid  # Import the uuid module
+import uuid  
 from httpx import AsyncClient, ASGITransport
 from unittest.mock import patch, AsyncMock
 
@@ -21,7 +21,6 @@ mock_user_session = USER_SESSION(
     created_at=1672531200, expired_at=9999999999
 )
 
-# --- Pytest Fixture for the Test Client ---
 @pytest_asyncio.fixture
 async def client():
     await DataBasePool.setup()
@@ -29,17 +28,14 @@ async def client():
         yield c
     await DataBasePool.teardown()
 
-# --- Your Updated Tests ---
 @pytest.mark.asyncio
 async def test_create_shop(client: AsyncClient):
-    """Test the successful creation of a new shop."""
     with patch("app.db.session.DB.getUserSession", new_callable=AsyncMock, return_value=mock_user_session):
-        # FINAL FIX: Generate a unique shop name for every test run.
         unique_shop_name = f"My Test Shop {uuid.uuid4()}"
         
         shop_data = {
             "owner_id": TEST_OWNER_ID, "fullName": "Test Vendor",
-            "shopName": unique_shop_name,  # Use the unique name here
+            "shopName": unique_shop_name,  
             "address": "101 Idempotent Road",
             "contact": "5566778899", "latitude": 23.83, "longitude": 91.27,
             "email": "testvendor-final-ci@example.com", "password": "a_secure_password"
@@ -53,7 +49,6 @@ async def test_create_shop(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_get_shop_by_id(client: AsyncClient):
-    """Test retrieving an existing shop by its ID."""
     with patch("app.db.session.DB.getUserSession", new_callable=AsyncMock, return_value=mock_user_session):
         headers = {"Cookie": "shopNear_=test_session_token"}
         response = await client.get(f"/shops/{TEST_SHOP_ID}", headers=headers)
@@ -66,7 +61,6 @@ async def test_get_shop_by_id(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_view_shop_by_owner(client: AsyncClient):
-    """Test retrieving shops by an existing owner ID."""
     with patch("app.db.session.DB.getUserSession", new_callable=AsyncMock, return_value=mock_user_session):
         headers = {"Cookie": "shopNear_=test_session_token"}
         response = await client.get(f"/shops/view_shop?owner_id={TEST_OWNER_ID}", headers=headers)
