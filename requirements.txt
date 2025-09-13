@@ -40,3 +40,5 @@ slowapi
 pytest
 pytest-asyncio
 httpx
+python-multipart
+fastapi[all]

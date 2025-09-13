@@ -12,6 +12,7 @@ from app.api.v1.endpoints.inventoryApi import inventory_router
 from app.api.v1.endpoints.searchApi import search_router 
 from app.api.v1.endpoints.statusApi import status_router
 from typesense_helper.typesense_client import create_collections 
+from fastapi.middleware.cors import CORSMiddleware
 
 
 port = 8059
@@ -25,16 +26,27 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+origins = [
+    "http://localhost:5173", 
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True, 
+    allow_methods=["*"], 
+    allow_headers=["*"], 
+)
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-app.include_router(user_router)
-app.include_router(shop_router)
-app.include_router(item_router)
-app.include_router(inventory_router)
-app.include_router(search_router)
-app.include_router(status_router)
+app.include_router(user_router, prefix="/api/v1")
+app.include_router(shop_router, prefix="/api/v1")
+app.include_router(item_router, prefix="/api/v1")
+app.include_router(inventory_router, prefix="/api/v1")
+app.include_router(search_router, prefix="/api/v1")
+app.include_router(status_router, prefix="/api/v1")
 
 
 @app.get("/")
