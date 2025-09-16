@@ -50,3 +50,19 @@ dependencies = [
     "ua-parser-builtins==0.18.0.post1",
     "uvicorn==0.35.0",
 ]
+
+[project.optional-dependencies]
+dev = [
+    "taskipy",
+]
+
+# Add this section to explicitly define your packages
+[tool.setuptools.packages.find]
+include = ["app*", "RDB*", "alembic*", "typesense_helper*"]
+
+[tool.taskipy.tasks]
+start = "uvicorn main:app --host 0.0.0.0 --port 8050 --reload"
+test = "pytest"
+migrate = "alembic upgrade head"
+sync_typesense = "python typesense_helper/sync_db_to_typesense.py"
+seed = "python fake_data_insert.py"
