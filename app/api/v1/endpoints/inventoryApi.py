@@ -7,7 +7,7 @@ from app.db.session import DataBasePool, authentication_required
 
 inventory_router = APIRouter(prefix="/inventory", tags=["Inventory"])
 
-idb = INDB() 
+idb = INDB()
 
 @inventory_router.post("/add")
 @authentication_required([UserRole.VENDOR, UserRole.ADMIN])
