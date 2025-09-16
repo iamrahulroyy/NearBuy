@@ -11,6 +11,7 @@ from app.api.v1.endpoints.itemsApi import item_router
 from app.api.v1.endpoints.inventoryApi import inventory_router 
 from app.api.v1.endpoints.searchApi import search_router 
 from app.api.v1.endpoints.statusApi import status_router
+from app.api.v1.endpoints.vendorApi import vendor_router 
 from typesense_helper.typesense_client import create_collections 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -47,6 +48,7 @@ app.include_router(item_router, prefix="/api/v1")
 app.include_router(inventory_router, prefix="/api/v1")
 app.include_router(search_router, prefix="/api/v1")
 app.include_router(status_router, prefix="/api/v1")
+app.include_router(vendor_router, prefix="/api/v1")
 
 
 @app.get("/")

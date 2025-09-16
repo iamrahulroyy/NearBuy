@@ -13,7 +13,7 @@ shop_router = APIRouter(prefix="/shops", tags=["Shops"])
 sdb = SDB() 
 
 @shop_router.post("/create_shop")
-@authentication_required([UserRole.VENDOR, UserRole.ADMIN])
+@authentication_required([UserRole.ADMIN])
 async def create_shop_endpoint(request: Request, data: ShopCreate, db_pool=Depends(DataBasePool.get_pool),ts_client: typesense.Client = Depends(get_typesense_client) ):
     return await sdb.create_shop(request, data, db_pool,ts_client)
 

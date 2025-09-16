@@ -38,3 +38,12 @@ class ShopUpdate(BaseModel):
     latitude: Optional[float]=  None
     longitude: Optional[float]=  None
     note: Optional[str] =  None
+class VendorShopCreate(BaseModel):
+    fullName: str
+    shopName: str
+    address: str
+    contact: Optional[str] = None
+    description: Optional[str] = None
+    is_open: bool = True
+    latitude: float
+    longitude: float
