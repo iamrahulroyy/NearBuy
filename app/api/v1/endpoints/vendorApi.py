@@ -9,7 +9,7 @@ from typesense_helper.typesense_client import get_typesense_client
 vendor_router = APIRouter(prefix="/vendors", tags=["Vendors"])
 vdb = VDB()
 
-@vendor_router.post("/shop")
+@vendor_router.post("/shop", description="vendor ep")
 @authentication_required([UserRole.VENDOR])
 async def create_shop_for_vendor_endpoint(
     request: Request, 

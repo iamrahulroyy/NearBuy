@@ -18,7 +18,7 @@ searchdb = SearchDB()
 # async def search_items_endpoint(request: Request, q: str = Query(..., description="Search query for item"),db_pool=Depends(DataBasePool.get_pool)):
 #     return await searchdb.search_items(request, q, db_pool)
 
-@search_router.get("/nearby", description="Search for items available in shops near a specific location.")
+@search_router.get("/nearby", description="Search for items available in shops near a specific location. (public ep)")
 @limiter.limit("30/minute")
 def search_nearby_endpoint(
     request: Request,

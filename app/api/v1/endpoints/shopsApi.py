@@ -12,27 +12,27 @@ import redis
 shop_router = APIRouter(prefix="/shops", tags=["Shops"])
 sdb = SDB() 
 
-@shop_router.post("/create_shop")
+@shop_router.post("/create_shop", description="admin ep (private)")
 @authentication_required([UserRole.ADMIN])
 async def create_shop_endpoint(request: Request, data: ShopCreate, db_pool=Depends(DataBasePool.get_pool),ts_client: typesense.Client = Depends(get_typesense_client) ):
     return await sdb.create_shop(request, data, db_pool,ts_client)
 
-@shop_router.patch("/update_shop")
+@shop_router.patch("/update_shop", description="vendor and admin ep")
 @authentication_required([UserRole.VENDOR,UserRole.ADMIN])
 async def update_shop_endpoint(request: Request, data: ShopUpdate, db_pool=Depends(DataBasePool.get_pool),ts_client: typesense.Client = Depends(get_typesense_client), redis_client: redis.Redis = Depends(get_redis_client)):
     return await sdb.update_shop(request, data, db_pool, ts_client, redis_client)
 
-@shop_router.get("/view_shop")
+@shop_router.get("/view_shop", description="user , state contributor, vendor and admin ep")
 @authentication_required([UserRole.USER,UserRole.VENDOR,UserRole.ADMIN,UserRole.STATE_CONTRIBUTER])
 async def view_shop_endpoint(request: Request, owner_id: str, db_pool=Depends(DataBasePool.get_pool),redis_client: redis.Redis = Depends(get_redis_client)):
     return await sdb.view_shop(request, owner_id, db_pool, redis_client)
 
-@shop_router.get("/{shop_id}")
+@shop_router.get("/{shop_id}", description="user , state contributor , vendor and admin ep")
 @authentication_required([UserRole.USER,UserRole.VENDOR,UserRole.ADMIN,UserRole.STATE_CONTRIBUTER])
 async def get_shop_endpoint(request: Request, shop_id: str, db_pool=Depends(DataBasePool.get_pool),redis_client: redis.Redis = Depends(get_redis_client)):
     return await sdb.get_shop(request, shop_id, db_pool, redis_client)
 
-@shop_router.delete("/{shop_id}")
+@shop_router.delete("/{shop_id}", description="admin ep (private)")
 @authentication_required([UserRole.ADMIN])
 async def delete_shop_endpoint(request: Request, shop_id: str, db_pool=Depends(DataBasePool.get_pool),ts_client: typesense.Client = Depends(get_typesense_client), redis_client: redis.Redis = Depends(get_redis_client)):
     return await sdb.delete_shop(request, shop_id, db_pool, ts_client, redis_client)

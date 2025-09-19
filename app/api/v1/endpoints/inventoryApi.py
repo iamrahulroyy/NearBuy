@@ -9,27 +9,27 @@ inventory_router = APIRouter(prefix="/inventory", tags=["Inventory"])
 
 idb = INDB()
 
-@inventory_router.post("/add")
+@inventory_router.post("/add", description="vendor and admin ep")
 @authentication_required([UserRole.VENDOR, UserRole.ADMIN])
 async def add_inventory_endpoint(request: Request, data: InventoryBase, db_pool=Depends(DataBasePool.get_pool)):
     return await idb.add_inventory(request, data, db_pool)
 
-@inventory_router.patch("/update")
-@authentication_required([UserRole.VENDOR, UserRole.ADMIN])
+@inventory_router.patch("/update", description="vendor and admin ep")
+@authentication_required([UserRole.VENDOR, UserRole.ADMIN],)
 async def update_inventory_endpoint(request: Request, data: InventoryUpdate, db_pool=Depends(DataBasePool.get_pool)):
     return await idb.update_inventory(request, data, db_pool)
 
-@inventory_router.get("/{inventory_id}")
+@inventory_router.get("/{inventory_id}", description="user and vendor and admin ep")
 @authentication_required([UserRole.USER, UserRole.VENDOR, UserRole.ADMIN])
 async def get_inventory_by_id_endpoint(request: Request, inventory_id: str, db_pool=Depends(DataBasePool.get_pool)):
     return await idb.get_inventory_by_id(request, inventory_id, db_pool)
 
-@inventory_router.get("/shop/{shop_id}")
+@inventory_router.get("/shop/{shop_id}", description="vendor and admin ep")
 @authentication_required([UserRole.USER, UserRole.VENDOR, UserRole.ADMIN])
 async def get_inventory_for_shop_endpoint(request: Request, shop_id: str, db_pool=Depends(DataBasePool.get_pool)):
     return await idb.get_inventory_for_shop(request, shop_id, db_pool)
 
-@inventory_router.delete("/{inventory_id}")
+@inventory_router.delete("/{inventory_id}", description="vendor and admin ep")
 @authentication_required([UserRole.VENDOR, UserRole.ADMIN])
 async def delete_inventory_endpoint(request: Request, inventory_id: str, db_pool=Depends(DataBasePool.get_pool)):
     return await idb.delete_inventory(request, inventory_id, db_pool)

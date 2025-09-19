@@ -61,7 +61,7 @@ dev = [
 include = ["app*", "RDB*", "alembic*", "typesense_helper*"]
 
 [tool.taskipy.tasks]
-start = "uvicorn main:app --host 0.0.0.0 --port 8050 --reload"
+start = "python main.py"
 test = "pytest"
 migrate = "alembic upgrade head"
 sync_typesense = "python typesense_helper/sync_db_to_typesense.py"

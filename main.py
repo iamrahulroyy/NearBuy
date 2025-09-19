@@ -16,7 +16,7 @@ from typesense_helper.typesense_client import create_collections
 from fastapi.middleware.cors import CORSMiddleware
 
 
-port = 8059
+port = 8050
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -29,6 +29,9 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 origins = [
     "http://localhost:5173", 
+    "http://localhost:8000",
+    "http://10.0.0.167:8050",
+    "http://10.0.0.204:8000",
 ]
 
 app.add_middleware(
@@ -58,4 +61,4 @@ def root():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)
