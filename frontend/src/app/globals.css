@@ -1,51 +1,29 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-poppins);
 }
 
 :root {
-  /* Light Mode (Default) */
+  /* Light Mode - Orange Theme */
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #1A1A1A;
   --card: #ffffff;
-  --card-foreground: #171717;
-  --primary: #E50914; /* Red */
+  --card-foreground: #1A1A1A;
+  --primary: #FF6B35; /* Orange accent */
   --primary-foreground: #ffffff;
-  --secondary: #f3f4f6;
-  --secondary-foreground: #1f2937;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
-  --accent: #f1f5f9;
-  --accent-foreground: #0f172a;
-  --destructive: #ef4444;
+  --secondary: #F3F4F6;
+  --secondary-foreground: #1F2937;
+  --muted: #F3F4F6;
+  --muted-foreground: #6B7280;
+  --accent: #FFF5F2; /* Light orange tint */
+  --accent-foreground: #FF6B35;
+  --destructive: #EF4444;
   --destructive-foreground: #ffffff;
-  --border: #e2e8f0;
-  --input: #e2e8f0;
-  --ring: #E50914;
-  --radius: 0.5rem;
-}
-
-[data-theme="dark"] {
-  /* Dark Mode (Optional/Legacy) */
-  --background: #0f172a;
-  --foreground: #f8fafc;
-  --card: #1e293b;
-  --card-foreground: #f8fafc;
-  --primary: #E50914;
-  --primary-foreground: #ffffff;
-  --secondary: #1e293b;
-  --secondary-foreground: #f8fafc;
-  --muted: #1e293b;
-  --muted-foreground: #94a3b8;
-  --accent: #1e293b;
-  --accent-foreground: #f8fafc;
-  --destructive: #f87171;
-  --destructive-foreground: #ffffff;
-  --border: #334155;
-  --input: #334155;
-  --ring: #E50914;
+  --border: #E5E7EB;
+  --input: #E5E7EB;
+  --ring: #FF6B35;
+  --radius: 0.75rem;
 }
 
 body {
@@ -74,6 +52,13 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--foreground);
+}
+
+/* Smooth transitions */
+* {
+  transition-property: color, background-color, border-color;
+  transition-duration: 200ms;
+  transition-timing-function: ease-in-out;
 }
 
 @import 'leaflet/dist/leaflet.css';

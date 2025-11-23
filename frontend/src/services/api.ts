@@ -28,24 +28,53 @@ export const searchNearby = async (
     });
 
     // Transform Typesense response to Shop interface
-    // The backend returns `body` which contains `hits`
-    // Based on search.py: return send_json_response(..., body=shop_results['hits'])
-    const hits: SearchResponse[] = response.data.body || [];
+    // The backend returns `body` which contains enhanced hits with distance
+    const hits: any[] = response.data.body || [];
 
-    return hits.map(hit => ({
-      id: hit.document.shop_id, // or hit.document.id depending on backend indexing
-      shopName: hit.document.shopName,
-      fullName: hit.document.fullName,
-      address: hit.document.address,
-      latitude: hit.document.location[0],
-      longitude: hit.document.location[1],
-      is_open: true, // Default or fetch if available
-      distance: '0.5km' // You might want to calculate this or extract from sort info
-    }));
+    return hits.map(hit => {
+      const distance_km = hit.distance_km || 0;
+      const distance_formatted = distance_km < 1
+        ? `${Math.round(distance_km * 1000)} m`
+        : `${distance_km.toFixed(1)} km`;
+
+      return {
+        id: hit.document.shop_id,
+        shopName: hit.document.shopName,
+        fullName: hit.document.fullName,
+        address: hit.document.address,
+        latitude: hit.document.location[0],
+        longitude: hit.document.location[1],
+        is_open: true,
+        distance: distance_formatted,
+        distance_km: distance_km
+      };
+    });
   } catch (error) {
     console.error('Error searching nearby:', error);
     return [];
   }
 };
 
+export const getSuggestions = async (
+  lat: number,
+  lon: number,
+  radiusKm: number = 10
+): Promise<string[]> => {
+  try {
+    const response = await api.get('/search/suggestions', {
+      params: {
+        lat,
+        lon,
+        radius_km: radiusKm
+      }
+    });
+
+    return response.data.body || [];
+  } catch (error) {
+    console.error('Error fetching suggestions:', error);
+    return [];
+  }
+};
+
 export default api;
+

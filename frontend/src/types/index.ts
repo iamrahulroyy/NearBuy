@@ -7,7 +7,8 @@ export interface Shop {
     is_open: boolean;
     latitude: number;
     longitude: number;
-    distance?: string; // Calculated on frontend or returned by search
+    distance?: string; // Formatted distance for display (e.g., "1.2 km")
+    distance_km?: number; // Actual distance in kilometers from backend
 }
 
 export interface Item {

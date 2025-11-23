@@ -44,14 +44,14 @@ export default function VendorSignupPage() {
         <div className="min-h-screen flex items-center justify-center bg-slate-50 relative overflow-hidden py-12">
             {/* Decorative Background Elements */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-                <div className="absolute top-[-10%] right-[-5%] w-96 h-96 bg-red-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob"></div>
+                <div className="absolute top-[-10%] right-[-5%] w-96 h-96 bg-orange-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob"></div>
                 <div className="absolute bottom-[-10%] left-[-5%] w-96 h-96 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-2000"></div>
             </div>
 
             <div className="max-w-2xl w-full space-y-8 bg-white p-10 rounded-3xl shadow-2xl relative z-10 border border-slate-100">
                 <div className="text-center">
                     <div className="flex justify-center mb-6">
-                        <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center">
+                        <div className="w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center">
                             <span className="text-3xl">🏪</span>
                         </div>
                     </div>
@@ -67,31 +67,31 @@ export default function VendorSignupPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="col-span-2 md:col-span-1">
                             <label htmlFor="fullName" className="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
-                            <input id="fullName" type="text" required className={`appearance-none block w-full px-4 py-3 border ${errors.fullName ? 'border-red-300 focus:ring-red-200' : 'border-slate-200 focus:ring-red-100'} rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-4 transition-all duration-200`} placeholder="John Doe" {...register('fullName')} />
+                            <input id="fullName" type="text" required className={`appearance-none block w-full px-4 py-3 border ${errors.fullName ? 'border-red-300 focus:ring-red-200' : 'border-slate-200 focus:ring-orange-100'} rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#FF6B35] focus:ring-4 transition-all duration-200`} placeholder="John Doe" {...register('fullName')} />
                             {errors.fullName && <p className="mt-1 text-sm text-red-500 font-medium">{errors.fullName.message}</p>}
                         </div>
                         <div className="col-span-2 md:col-span-1">
                             <label htmlFor="shopName" className="block text-sm font-medium text-slate-700 mb-1">Shop Name</label>
-                            <input id="shopName" type="text" required className={`appearance-none block w-full px-4 py-3 border ${errors.shopName ? 'border-red-300 focus:ring-red-200' : 'border-slate-200 focus:ring-red-100'} rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-4 transition-all duration-200`} placeholder="My Awesome Shop" {...register('shopName')} />
+                            <input id="shopName" type="text" required className={`appearance-none block w-full px-4 py-3 border ${errors.shopName ? 'border-red-300 focus:ring-red-200' : 'border-slate-200 focus:ring-orange-100'} rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#FF6B35] focus:ring-4 transition-all duration-200`} placeholder="My Awesome Shop" {...register('shopName')} />
                             {errors.shopName && <p className="mt-1 text-sm text-red-500 font-medium">{errors.shopName.message}</p>}
                         </div>
                         <div className="col-span-2">
                             <label htmlFor="address" className="block text-sm font-medium text-slate-700 mb-1">Shop Address</label>
-                            <input id="address" type="text" required className={`appearance-none block w-full px-4 py-3 border ${errors.address ? 'border-red-300 focus:ring-red-200' : 'border-slate-200 focus:ring-red-100'} rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-4 transition-all duration-200`} placeholder="123 Main St, City" {...register('address')} />
+                            <input id="address" type="text" required className={`appearance-none block w-full px-4 py-3 border ${errors.address ? 'border-red-300 focus:ring-red-200' : 'border-slate-200 focus:ring-orange-100'} rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#FF6B35] focus:ring-4 transition-all duration-200`} placeholder="123 Main St, City" {...register('address')} />
                             {errors.address && <p className="mt-1 text-sm text-red-500 font-medium">{errors.address.message}</p>}
                         </div>
                         <div className="col-span-2 md:col-span-1">
                             <label htmlFor="contact" className="block text-sm font-medium text-slate-700 mb-1">Contact Number (Optional)</label>
-                            <input id="contact" type="text" className={`appearance-none block w-full px-4 py-3 border ${errors.contact ? 'border-red-300 focus:ring-red-200' : 'border-slate-200 focus:ring-red-100'} rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-4 transition-all duration-200`} placeholder="+1 234 567 890" {...register('contact')} />
+                            <input id="contact" type="text" className={`appearance-none block w-full px-4 py-3 border ${errors.contact ? 'border-red-300 focus:ring-red-200' : 'border-slate-200 focus:ring-orange-100'} rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#FF6B35] focus:ring-4 transition-all duration-200`} placeholder="+1 234 567 890" {...register('contact')} />
                         </div>
                         <div className="col-span-2 md:col-span-1">
                             <label htmlFor="email-address" className="block text-sm font-medium text-slate-700 mb-1">Email address</label>
-                            <input id="email-address" type="email" autoComplete="email" required className={`appearance-none block w-full px-4 py-3 border ${errors.email ? 'border-red-300 focus:ring-red-200' : 'border-slate-200 focus:ring-red-100'} rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-4 transition-all duration-200`} placeholder="you@example.com" {...register('email')} />
+                            <input id="email-address" type="email" autoComplete="email" required className={`appearance-none block w-full px-4 py-3 border ${errors.email ? 'border-red-300 focus:ring-red-200' : 'border-slate-200 focus:ring-orange-100'} rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#FF6B35] focus:ring-4 transition-all duration-200`} placeholder="you@example.com" {...register('email')} />
                             {errors.email && <p className="mt-1 text-sm text-red-500 font-medium">{errors.email.message}</p>}
                         </div>
                         <div className="col-span-2">
                             <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1">Password</label>
-                            <input id="password" type="password" autoComplete="new-password" required className={`appearance-none block w-full px-4 py-3 border ${errors.password ? 'border-red-300 focus:ring-red-200' : 'border-slate-200 focus:ring-red-100'} rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-4 transition-all duration-200`} placeholder="••••••••" {...register('password')} />
+                            <input id="password" type="password" autoComplete="new-password" required className={`appearance-none block w-full px-4 py-3 border ${errors.password ? 'border-red-300 focus:ring-red-200' : 'border-slate-200 focus:ring-orange-100'} rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#FF6B35] focus:ring-4 transition-all duration-200`} placeholder="••••••••" {...register('password')} />
                             {errors.password && <p className="mt-1 text-sm text-red-500 font-medium">{errors.password.message}</p>}
                         </div>
                     </div>
@@ -110,7 +110,7 @@ export default function VendorSignupPage() {
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="group relative w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-[#E50914] hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-500/30 disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-200 shadow-lg shadow-red-500/30 hover:shadow-red-500/40 hover:-translate-y-0.5 active:translate-y-0"
+                            className="group relative w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-[#FF6B35] hover:bg-[#e55a2b] focus:outline-none focus:ring-4 focus:ring-orange-500/30 disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-200 shadow-lg shadow-orange-500/30 hover:shadow-orange-500/40 hover:-translate-y-0.5 active:translate-y-0"
                         >
                             {isSubmitting ? (
                                 <span className="flex items-center gap-2">
@@ -127,12 +127,12 @@ export default function VendorSignupPage() {
                     <div className="mt-6 text-center space-y-4">
                         <p className="text-sm text-slate-500">
                             Already have an account?{' '}
-                            <Link href="/login" className="font-bold text-slate-900 hover:text-primary transition-colors">
+                            <Link href="/login" className="font-bold text-slate-900 hover:text-[#FF6B35] transition-colors">
                                 Sign in
                             </Link>
                         </p>
                         <div className="border-t border-slate-100 pt-4">
-                            <Link href="/signup/user" className="text-xs font-medium text-slate-400 hover:text-primary transition-colors">
+                            <Link href="/signup/user" className="text-xs font-medium text-slate-400 hover:text-[#FF6B35] transition-colors">
                                 Looking to buy? Sign up as a User
                             </Link>
                         </div>

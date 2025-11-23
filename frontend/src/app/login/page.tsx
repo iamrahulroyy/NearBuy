@@ -38,14 +38,14 @@ export default function LoginPage() {
         <div className="min-h-screen flex items-center justify-center bg-slate-50 relative overflow-hidden">
             {/* Decorative Background Elements */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-                <div className="absolute top-[-10%] right-[-5%] w-96 h-96 bg-red-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob"></div>
-                <div className="absolute bottom-[-10%] left-[-5%] w-96 h-96 bg-orange-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-2000"></div>
+                <div className="absolute top-[-10%] right-[-5%] w-96 h-96 bg-orange-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob"></div>
+                <div className="absolute bottom-[-10%] left-[-5%] w-96 h-96 bg-yellow-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-2000"></div>
             </div>
 
             <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-3xl shadow-2xl relative z-10 border border-slate-100">
                 <div className="text-center">
                     <div className="flex justify-center mb-6">
-                        <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center">
+                        <div className="w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center">
                             <span className="text-3xl">🔐</span>
                         </div>
                     </div>
@@ -68,7 +68,7 @@ export default function LoginPage() {
                                 type="email"
                                 autoComplete="email"
                                 required
-                                className={`appearance-none block w-full px-4 py-3 border ${errors.email ? 'border-red-300 focus:ring-red-200' : 'border-slate-200 focus:ring-red-100'} rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-4 transition-all duration-200`}
+                                className={`appearance-none block w-full px-4 py-3 border ${errors.email ? 'border-red-300 focus:ring-red-200' : 'border-slate-200 focus:ring-orange-100'} rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#FF6B35] focus:ring-4 transition-all duration-200`}
                                 placeholder="you@example.com"
                                 {...register('email')}
                             />
@@ -85,7 +85,7 @@ export default function LoginPage() {
                                 type="password"
                                 autoComplete="current-password"
                                 required
-                                className={`appearance-none block w-full px-4 py-3 border ${errors.password ? 'border-red-300 focus:ring-red-200' : 'border-slate-200 focus:ring-red-100'} rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-4 transition-all duration-200`}
+                                className={`appearance-none block w-full px-4 py-3 border ${errors.password ? 'border-red-300 focus:ring-red-200' : 'border-slate-200 focus:ring-orange-100'} rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#FF6B35] focus:ring-4 transition-all duration-200`}
                                 placeholder="••••••••"
                                 {...register('password')}
                             />
@@ -100,7 +100,7 @@ export default function LoginPage() {
                             <input
                                 id="keep-login"
                                 type="checkbox"
-                                className="h-4 w-4 text-primary focus:ring-primary border-slate-300 rounded cursor-pointer"
+                                className="h-4 w-4 text-[#FF6B35] focus:ring-[#FF6B35] border-slate-300 rounded cursor-pointer"
                                 {...register('keepLogin')}
                             />
                             <label htmlFor="keep-login" className="ml-2 block text-sm text-slate-600 cursor-pointer select-none">
@@ -109,7 +109,7 @@ export default function LoginPage() {
                         </div>
 
                         <div className="text-sm">
-                            <a href="#" className="font-medium text-primary hover:text-red-700 transition-colors">
+                            <a href="#" className="font-medium text-[#FF6B35] hover:text-[#e55a2b] transition-colors">
                                 Forgot password?
                             </a>
                         </div>
@@ -129,7 +129,7 @@ export default function LoginPage() {
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="group relative w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-[#E50914] hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-500/30 disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-200 shadow-lg shadow-red-500/30 hover:shadow-red-500/40 hover:-translate-y-0.5 active:translate-y-0"
+                            className="group relative w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-[#FF6B35] hover:bg-[#e55a2b] focus:outline-none focus:ring-4 focus:ring-orange-500/30 disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-200 shadow-lg shadow-orange-500/30 hover:shadow-orange-500/40 hover:-translate-y-0.5 active:translate-y-0"
                         >
                             {isSubmitting ? (
                                 <span className="flex items-center gap-2">

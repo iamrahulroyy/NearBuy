@@ -7,7 +7,6 @@ from app.db.models.shop import SHOP
 from app.db.models.item import ITEM
 from typesense_helper.typesense_client import get_typesense_client, create_collections
 from app.helpers.variables import DATABASE_URL
-from app.helpers.geo import geometry_to_latlon
 
 engine = create_engine(DATABASE_URL)
 
@@ -24,10 +23,9 @@ def sync_database_to_typesense():
         shop_documents = []
         for shop in shops:
             print(f"Processing shop: {shop.shop_id}")
-            coords = geometry_to_latlon(shop.location)
-            print(f"Coordinates: {coords}")
             
-            if coords and coords.get("latitude") is not None:
+            # Use latitude and longitude directly from the model
+            if shop.latitude is not None and shop.longitude is not None:
                 shop_doc = {
                     "shop_id": str(shop.shop_id),
                     "owner_id": str(shop.owner_id),
@@ -37,10 +35,10 @@ def sync_database_to_typesense():
                     "contact": shop.contact if shop.contact else "",
                     "description": shop.description if shop.description else "",
                     "is_open": shop.is_open,
-                    "location": [coords["latitude"], coords["longitude"]],
+                    "location": [shop.latitude, shop.longitude],
                 }
                 shop_documents.append(shop_doc)
-                print(f"Added shop document: {shop_doc}")
+                print(f"Added shop: {shop.shopName} at ({shop.latitude}, {shop.longitude})")
             else:
                 print(f"Skipping shop {shop.shop_id} - no valid coordinates")
 
@@ -58,22 +56,24 @@ def sync_database_to_typesense():
             
         print("Fetching all items from the database...")
         items = session.exec(select(ITEM)).all()
+        print(f"Found {len(items)} items in database")
         item_documents = []
         for item in items:
             item_documents.append({
-                "id": str(item.id),
+                "item_id": str(item.id),  # Changed from "id" to "item_id" to match schema
                 "itemName": item.itemName,
-                "description": item.description,
+                "description": item.description if item.description else "",
                 "shop_id": str(item.shop_id),
                 "price": item.price,
-                "note": item.note,
+                "note": item.note if item.note else "",
             })
 
         if item_documents:
             print(f"Indexing {len(item_documents)} items...")
-            ts_client.collections["items"].documents.import_(
+            result = ts_client.collections["items"].documents.import_(
                 item_documents, {"action": "upsert"}
             )
+            print(f"Import result summary: {len([r for r in result if r.get('success')])} successful")
             print("Finished indexing items.")
 
 if __name__ == "__main__":

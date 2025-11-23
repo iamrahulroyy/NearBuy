@@ -1,121 +1,147 @@
 'use client';
 
-import { Search } from 'lucide-react';
-import { useState } from 'react';
+import { Search, ChevronDown, SlidersHorizontal, Sparkles, MapPin } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
 
 interface HeroProps {
     onSearch: (query: string) => void;
+    radius: number;
+    onRadiusChange: (radius: number) => void;
 }
 
-const Hero = ({ onSearch }: HeroProps) => {
+const Hero = ({ onSearch, radius, onRadiusChange }: HeroProps) => {
     const [query, setQuery] = useState('');
+    const [isRadiusOpen, setIsRadiusOpen] = useState(false);
+    const radiusRef = useRef<HTMLDivElement>(null);
 
-    const handleSearch = () => {
-        if (query.trim()) {
-            onSearch(query);
+    const handleSearch = (searchQuery: string = query) => {
+        if (searchQuery.trim()) {
+            onSearch(searchQuery);
+            setQuery(searchQuery); // Ensure input reflects the search
         }
     };
 
+    // Close radius dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (radiusRef.current && !radiusRef.current.contains(event.target as Node)) {
+                setIsRadiusOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const quickChips = [
+        { label: 'Batteries', icon: '🔋' },
+        { label: 'Milk', icon: '🥛' },
+        { label: 'Chargers', icon: '🔌' },
+        { label: 'Rice', icon: '🍚' },
+        { label: 'Headphones', icon: '🎧' },
+        { label: 'Cooking Oil', icon: '🍳' },
+        { label: 'Dumbbells', icon: '🏋️' },
+        { label: 'Football', icon: '⚽' },
+        { label: 'Bookshelf', icon: '📚' },
+    ];
+
     return (
-        <section className="relative bg-slate-50 pt-12 pb-20 md:pt-20 md:pb-32 overflow-hidden min-h-[600px] flex items-center">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
-                <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+        <section className="relative w-full bg-gradient-to-br from-orange-50 via-white to-orange-50 pt-20 pb-24 overflow-hidden">
+            {/* Background Decorative Blobs */}
+            <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+                <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-[#FF6B35]/10 rounded-full blur-3xl animate-pulse-slow"></div>
+                <div className="absolute top-[20%] -right-[10%] w-[30%] h-[30%] bg-orange-200/20 rounded-full blur-3xl animate-pulse-slow delay-1000"></div>
+            </div>
 
-                    {/* Left Content */}
-                    <div className="w-full lg:w-1/2 text-center lg:text-left">
-                        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-slate-900 leading-tight mb-8">
-                            Find what you need<br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E50914] to-orange-500">
-                                in shops near you.
-                            </span>
-                        </h1>
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div className="text-center mb-10">
+                    <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight leading-tight">
+                        Find what you need in <span className="text-[#FF6B35]">shops near you</span>.
+                    </h1>
+                    <p className="text-lg text-slate-500 max-w-2xl mx-auto">
+                        Search for products, browse local inventories, and find the best deals in your neighborhood.
+                    </p>
+                </div>
 
-                        <div className="relative max-w-xl mx-auto lg:mx-0">
-                            <div className="bg-white p-2 rounded-full shadow-2xl flex items-center border border-slate-100 transform transition-transform hover:scale-[1.02]">
-                                <div className="pl-6 pr-4 text-slate-400">
-                                    <Search className="w-6 h-6" />
-                                </div>
+                {/* Glass Card Container */}
+                <div className="bg-white/70 backdrop-blur-xl border border-white/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-3xl p-6 md:p-10">
+
+                    {/* Unified Search Block */}
+                    <div className="max-w-3xl mx-auto mb-10">
+                        <div className="bg-white rounded-full shadow-[0_4px_20px_rgb(0,0,0,0.08)] flex items-center border border-gray-100 p-2 hover:shadow-[0_8px_25px_rgb(0,0,0,0.12)] transition-all duration-300">
+
+                            {/* Radius Selector */}
+                            <div className="relative" ref={radiusRef}>
+                                <button
+                                    onClick={() => setIsRadiusOpen(!isRadiusOpen)}
+                                    className="flex items-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 font-semibold px-5 py-3 rounded-full transition-colors ml-1"
+                                >
+                                    <SlidersHorizontal className="w-4 h-4" />
+                                    <span className="whitespace-nowrap">{radius} km</span>
+                                    <ChevronDown className={`w-4 h-4 transition-transform ${isRadiusOpen ? 'rotate-180' : ''}`} />
+                                </button>
+
+                                {/* Dropdown */}
+                                {isRadiusOpen && (
+                                    <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden py-2 animate-in fade-in zoom-in-95 duration-200 z-50">
+                                        <div className="px-4 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Search Radius</div>
+                                        {[1, 5, 10, 25, 50].map((r) => (
+                                            <button
+                                                key={r}
+                                                onClick={() => {
+                                                    onRadiusChange(r);
+                                                    setIsRadiusOpen(false);
+                                                }}
+                                                className={`w-full text-left px-4 py-2.5 text-sm font-medium transition-colors flex items-center justify-between ${radius === r ? 'bg-orange-50 text-[#FF6B35]' : 'text-gray-600 hover:bg-gray-50'
+                                                    }`}
+                                            >
+                                                <span>{r} km</span>
+                                                {radius === r && <div className="w-2 h-2 rounded-full bg-[#FF6B35]" />}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Search Input */}
+                            <div className="flex-1 flex items-center px-4">
+                                <Search className="w-6 h-6 text-gray-400 mr-3" />
                                 <input
                                     type="text"
-                                    placeholder="Search for items (e.g. batteries, milk)..."
-                                    className="flex-1 bg-transparent border-none outline-none text-slate-700 placeholder:text-slate-400 h-12 text-lg w-full"
+                                    placeholder="Search for items..."
+                                    className="flex-1 bg-transparent border-none outline-none text-gray-900 placeholder:text-gray-400 h-12 text-lg w-full font-medium"
                                     value={query}
                                     onChange={(e) => setQuery(e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                                 />
-                                <button
-                                    onClick={handleSearch}
-                                    className="bg-[#E50914] hover:bg-red-700 text-white rounded-full px-6 sm:px-10 py-3 sm:py-4 font-bold transition-all shadow-lg shadow-red-500/30 hover:shadow-red-500/50 active:scale-95"
-                                >
-                                    GO
-                                </button>
                             </div>
-                            <p className="mt-4 text-slate-500 text-sm font-medium">
-                                Popular: <span className="text-slate-700 cursor-pointer hover:text-[#E50914]">Batteries</span>, <span className="text-slate-700 cursor-pointer hover:text-[#E50914]">Milk</span>, <span className="text-slate-700 cursor-pointer hover:text-[#E50914]">Chargers</span>
-                            </p>
+
+                            {/* GO Button */}
+                            <button
+                                onClick={() => handleSearch()}
+                                className="bg-[#FF6B35] hover:bg-[#FF5722] text-white rounded-full px-8 md:px-10 py-3 md:py-4 font-bold text-lg transition-all shadow-lg shadow-orange-500/20 hover:scale-105 active:scale-95"
+                            >
+                                GO
+                            </button>
                         </div>
                     </div>
 
-                    {/* Right Image - Circular Animation */}
-                    <div className="w-full lg:w-1/2 relative mt-10 lg:mt-0">
-                        <div className="relative w-full max-w-[500px] lg:max-w-[600px] aspect-square mx-auto">
-                            {/* Decorative Blobs */}
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-red-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
-                            <div className="absolute bottom-0 left-0 w-64 h-64 bg-orange-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
-                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-white/50 rounded-full blur-3xl -z-10"></div>
-
-                            {/* Main Central Image */}
-                            <div className="absolute inset-0 flex items-center justify-center z-10">
-                                <div className="relative w-64 h-64 sm:w-80 sm:h-80 bg-white rounded-full shadow-2xl flex items-center justify-center animate-float border-8 border-white">
-                                    <span className="text-[8rem] sm:text-[10rem] drop-shadow-lg transform hover:scale-110 transition-transform duration-300 cursor-default">🛍️</span>
-                                </div>
-                            </div>
-
-                            {/* Orbiting Items */}
-                            {/* Item 1: Top Left */}
-                            <div className="absolute top-[10%] left-[15%] bg-white p-3 sm:p-4 rounded-2xl shadow-xl flex items-center gap-3 animate-pop-in animation-delay-0 hover:scale-110 transition-transform cursor-pointer z-20">
-                                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 rounded-full flex items-center justify-center text-2xl">🔋</div>
-                                <div className="hidden sm:block">
-                                    <p className="text-xs text-slate-500 font-bold uppercase">Electronics</p>
-                                    <p className="text-sm font-bold text-slate-900">Batteries</p>
-                                </div>
-                            </div>
-
-                            {/* Item 2: Top Right */}
-                            <div className="absolute top-[15%] right-[10%] bg-white p-3 sm:p-4 rounded-2xl shadow-xl flex items-center gap-3 animate-pop-in animation-delay-1000 hover:scale-110 transition-transform cursor-pointer z-20">
-                                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-orange-50 rounded-full flex items-center justify-center text-2xl">🥛</div>
-                                <div className="hidden sm:block">
-                                    <p className="text-xs text-slate-500 font-bold uppercase">Dairy</p>
-                                    <p className="text-sm font-bold text-slate-900">Fresh Milk</p>
-                                </div>
-                            </div>
-
-                            {/* Item 3: Bottom Right */}
-                            <div className="absolute bottom-[20%] right-[5%] bg-white p-3 sm:p-4 rounded-2xl shadow-xl flex items-center gap-3 animate-pop-in animation-delay-2000 hover:scale-110 transition-transform cursor-pointer z-20">
-                                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-50 rounded-full flex items-center justify-center text-2xl">🥦</div>
-                                <div className="hidden sm:block">
-                                    <p className="text-xs text-slate-500 font-bold uppercase">Fresh</p>
-                                    <p className="text-sm font-bold text-slate-900">Vegetables</p>
-                                </div>
-                            </div>
-
-                            {/* Item 4: Bottom Left */}
-                            <div className="absolute bottom-[10%] left-[5%] bg-white p-3 sm:p-4 rounded-2xl shadow-xl flex items-center gap-3 animate-pop-in animation-delay-3000 hover:scale-110 transition-transform cursor-pointer z-20">
-                                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-50 rounded-full flex items-center justify-center text-2xl">🧴</div>
-                                <div className="hidden sm:block">
-                                    <p className="text-xs text-slate-500 font-bold uppercase">Essentials</p>
-                                    <p className="text-sm font-bold text-slate-900">Shampoo</p>
-                                </div>
-                            </div>
-
-                            {/* Item 5: Top Center (Mobile only mostly) */}
-                            <div className="absolute -top-[5%] left-1/2 transform -translate-x-1/2 bg-white p-3 sm:p-4 rounded-2xl shadow-xl flex items-center gap-3 animate-pop-in animation-delay-1500 hover:scale-110 transition-transform cursor-pointer z-20">
-                                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-yellow-50 rounded-full flex items-center justify-center text-2xl">🍞</div>
-                                <div className="hidden sm:block">
-                                    <p className="text-xs text-slate-500 font-bold uppercase">Bakery</p>
-                                    <p className="text-sm font-bold text-slate-900">Bread</p>
-                                </div>
-                            </div>
+                    {/* Quick Search Section */}
+                    <div className="text-center">
+                        <div className="flex items-center justify-center gap-2 mb-6 opacity-80">
+                            <Sparkles className="w-4 h-4 text-[#FF6B35]" />
+                            <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Quick Search</span>
+                        </div>
+                        <div className="flex flex-wrap justify-center gap-3">
+                            {quickChips.map((chip) => (
+                                <button
+                                    key={chip.label}
+                                    onClick={() => handleSearch(chip.label)}
+                                    className="group flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 rounded-full text-sm font-semibold text-slate-600 hover:border-[#FF6B35] hover:text-[#FF6B35] hover:bg-orange-50 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5"
+                                >
+                                    <span className="text-lg group-hover:scale-110 transition-transform duration-300">{chip.icon}</span>
+                                    <span>{chip.label}</span>
+                                </button>
+                            ))}
                         </div>
                     </div>
                 </div>

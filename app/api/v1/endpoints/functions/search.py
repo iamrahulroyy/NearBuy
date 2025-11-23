@@ -81,7 +81,22 @@ class SearchDB:
             shop_results = ts_client.collections['shops'].documents.search(shop_search_params)
             # print(f"Shop search returned {len(shop_results['hits'])} results")
 
-            return send_json_response(message="Nearby shops with the item found.", status=200, body=shop_results['hits'])
+            # Extract distance from geo_distance_meters in Typesense results
+            enhanced_results = []
+            for hit in shop_results['hits']:
+                shop_data = hit.copy()
+                # Typesense provides geo_distance_meters in the hit when using location sort
+                if 'geo_distance_meters' in hit:
+                    distance_meters = hit['geo_distance_meters'].get('location', 0)
+                    shop_data['distance_km'] = round(distance_meters / 1000, 2)  # Convert to km
+                    shop_data['distance_meters'] = distance_meters
+                else:
+                    # Fallback: calculate manually if not provided
+                    shop_data['distance_km'] = 0
+                    shop_data['distance_meters'] = 0
+                enhanced_results.append(shop_data)
+
+            return send_json_response(message="Nearby shops with the item found.", status=200, body=enhanced_results)
 
         except typesense.exceptions.RequestMalformed as e:
             print(f"RequestMalformed error: {e}")
@@ -89,3 +104,56 @@ class SearchDB:
         except Exception as e:
             traceback.print_exc()
             raise HTTPException(status_code=500, detail="An internal error occurred during the search.")
+
+    def get_city_suggestions(self, lat: float, lon: float, radius_km: int, ts_client: typesense.Client):
+        """Get available item suggestions within a geographic area"""
+        try:
+            radius_km_str = f"{radius_km} km"
+            
+            # Search for all shops in the area
+            shop_search_params = {
+                'q': '*',
+                'filter_by': f'location:({lat}, {lon}, {radius_km_str})',
+                'per_page': 100
+            }
+            
+            shop_results = ts_client.collections['shops'].documents.search(shop_search_params)
+            
+            if not shop_results['hits']:
+                return send_json_response(
+                    message="No shops found in this area.", 
+                    status=200, 
+                    body=[]
+                )
+            
+            # Get all shop IDs
+            shop_ids = [hit['document']['shop_id'] for hit in shop_results['hits']]
+            
+            # Search for all items in these shops
+            item_search_params = {
+                'q': '*',
+                'filter_by': f'shop_id:[{",".join(shop_ids)}]',
+                'per_page': 250
+            }
+            
+            item_results = ts_client.collections['items'].documents.search(item_search_params)
+            
+            # Extract unique item names
+            unique_items = set()
+            for hit in item_results['hits']:
+                item_name = hit['document'].get('itemName', '')
+                if item_name:
+                    unique_items.add(item_name)
+            
+            # Sort and return as list
+            suggestions = sorted(list(unique_items))
+            
+            return send_json_response(
+                message=f"Found {len(suggestions)} unique items available in this area.", 
+                status=200, 
+                body=suggestions
+            )
+            
+        except Exception as e:
+            traceback.print_exc()
+            raise HTTPException(status_code=500, detail="An error occurred while fetching suggestions.")

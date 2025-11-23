@@ -37,7 +37,7 @@ def run():
     existing_shop = db_pool.exec(statement).first()
     
     # Define the location point
-    shop_location = create_point_geometry(latitude=20.2961, longitude=85.8245)
+    # shop_location = create_point_geometry(latitude=20.2961, longitude=85.8245)
     
     if not existing_shop:
         shop = SHOP(
@@ -49,13 +49,15 @@ def run():
             contact="+91-9811122233",
             description="Authentic Indian handicrafts and textiles.",
             is_open=True,
-            location=shop_location # Set location on creation
+            latitude=20.2961,
+            longitude=85.8245
         )
         db_pool.add(shop)
         print(f"Creating shop: {shop.shopName} with location.")
     else:
         # If shop exists, UPDATE its location
-        existing_shop.location = shop_location
+        existing_shop.latitude = 20.2961
+        existing_shop.longitude = 85.8245
         db_pool.add(existing_shop)
         print(f"Found existing shop. Updating location for: {existing_shop.shopName}")
 

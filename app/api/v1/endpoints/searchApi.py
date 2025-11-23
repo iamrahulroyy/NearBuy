@@ -37,3 +37,23 @@ def search_nearby_endpoint(
         traceback.print_exc()
         print(f"An unexpected error occurred in the search endpoint: {e}")
         raise HTTPException(status_code=500, detail="An unexpected server error occurred.")
+
+@search_router.get("/suggestions", description="Get available item suggestions in a geographic area. (public ep)")
+@limiter.limit("30/minute")
+def search_suggestions_endpoint(
+    request: Request,
+    lat: float = Query(..., description="Your current latitude.", ge=-90, le=90),
+    lon: float = Query(..., description="Your current longitude.", ge=-180, le=180),
+    radius_km: int = Query(10, description="The search radius in kilometers.", ge=1, le=50),
+    ts_client: typesense.Client = Depends(get_typesense_client)
+):
+    try:
+        results = searchdb.get_city_suggestions(lat=lat, lon=lon, radius_km=radius_km, ts_client=ts_client)
+        return results
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        traceback.print_exc()
+        print(f"An unexpected error occurred in the suggestions endpoint: {e}")
+        raise HTTPException(status_code=500, detail="An unexpected server error occurred.")
+

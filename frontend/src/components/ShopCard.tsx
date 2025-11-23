@@ -1,6 +1,6 @@
 'use client';
 
-import { Star, MapPin } from 'lucide-react';
+import { Star, MapPin, Navigation } from 'lucide-react';
 import { Shop } from '@/types';
 
 interface ShopCardProps {
@@ -21,6 +21,13 @@ export default function ShopCard({ data }: ShopCardProps) {
                 <div className={`absolute top-3 right-3 px-2 py-1 rounded-lg text-xs font-bold shadow-sm ${data.is_open ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                     {data.is_open ? 'Open' : 'Closed'}
                 </div>
+                {/* Distance Badge */}
+                {data.distance && (
+                    <div className="absolute top-3 left-3 px-3 py-1 bg-[#E50914] text-white rounded-full text-xs font-bold shadow-md flex items-center gap-1">
+                        <Navigation className="w-3 h-3" />
+                        {data.distance}
+                    </div>
+                )}
             </div>
 
             {/* Content Section */}
@@ -38,10 +45,7 @@ export default function ShopCard({ data }: ShopCardProps) {
                 <div className="flex items-center justify-between pt-4 border-t border-slate-50">
                     <div className="flex items-center gap-1 text-slate-400 text-xs">
                         <MapPin className="w-3 h-3" />
-                        <span>{data.distance || 'Nearby'}</span>
-                    </div>
-                    <div className="text-xs font-medium text-slate-500">
-                        {data.address}
+                        <span className="line-clamp-1">{data.address}</span>
                     </div>
                 </div>
             </div>

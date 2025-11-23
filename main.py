@@ -12,6 +12,8 @@ from app.api.v1.endpoints.inventoryApi import inventory_router
 from app.api.v1.endpoints.searchApi import search_router 
 from app.api.v1.endpoints.statusApi import status_router
 from app.api.v1.endpoints.vendorApi import vendor_router 
+from app.api.v1.endpoints.categoriesApi import categories_router
+from app.api.v1.endpoints.shopsListApi import shops_list_router
 from typesense_helper.typesense_client import create_collections 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -21,17 +23,24 @@ port = 8050
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await DataBasePool.setup()
-    create_collections()
+    try:
+        create_collections()
+    except Exception as e:
+        print(f"Warning: Could not connect to Typesense: {e}")
     yield
     await DataBasePool.teardown()
 
 
 app = FastAPI(lifespan=lifespan)
 origins = [
-    "http://localhost:5173", 
+    "http://localhost:3000",  # Next.js default port
+    "http://localhost:5173",  # Vite default port
     "http://localhost:8000",
+    "http://localhost:8050",  # Backend port
     "http://10.0.0.167:8050",
     "http://10.0.0.204:8000",
+    # For development: allow any localhost port
+    "http://127.0.0.1:3000",
 ]
 
 app.add_middleware(
@@ -52,6 +61,8 @@ app.include_router(inventory_router, prefix="/api/v1")
 app.include_router(search_router, prefix="/api/v1")
 app.include_router(status_router, prefix="/api/v1")
 app.include_router(vendor_router, prefix="/api/v1")
+app.include_router(categories_router, prefix="/api/v1/categories")
+app.include_router(shops_list_router, prefix="/api/v1/public/shops")
 
 
 @app.get("/")
