@@ -3,7 +3,7 @@ from slowapi import Limiter
 from slowapi.util import get_remote_address
 from sqlmodel import Session, select, func, create_engine
 from app.db.models.shop import SHOP
-from typing import Optional
+from typing import Optional, TypedDict
 from app.helpers.variables import DATABASE_URL
 
 engine = create_engine(DATABASE_URL)
@@ -22,6 +22,12 @@ CATEGORY_MAP = {
     "home": {"name": "Home & Living", "icon": "🏠"},
     "toys": {"name": "Toys & Games", "icon": "🎮"},
 }
+
+class CategoryDict(TypedDict):
+    id: str
+    name: str
+    icon: str
+    count: int
 
 def categorize_shop(shop_name: str, description: str = "") -> str:
     """Categorize shop based on name and description"""
@@ -46,7 +52,7 @@ def categorize_shop(shop_name: str, description: str = "") -> str:
     else:
         return "grocery"  # Default category
 
-@categories_router.get("/", description="Get all available categories with shop counts")
+@categories_router.get("", description="Get all available categories with shop counts")
 @limiter.limit("30/minute")
 def get_categories(request: Request):
     try:
@@ -55,13 +61,13 @@ def get_categories(request: Request):
             shops = session.exec(select(SHOP)).all()
         
         # Count shops by category
-        category_counts = {}
+        category_counts: dict[str, int] = {}
         for shop in shops:
             category = categorize_shop(shop.shopName, shop.description or "")
             category_counts[category] = category_counts.get(category, 0) + 1
         
         # Build response
-        categories = []
+        categories: list[CategoryDict] = []
         for cat_id, info in CATEGORY_MAP.items():
             count = category_counts.get(cat_id, 0)
             if count > 0:  # Only include categories with shops

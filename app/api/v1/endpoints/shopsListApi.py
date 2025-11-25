@@ -40,7 +40,7 @@ def extract_city(address: str) -> str:
         return parts[1].strip()
     return "Unknown"
 
-@shops_list_router.get("/", description="Get all shops with optional filters")
+@shops_list_router.get("", description="Get all shops with optional filters")
 @limiter.limit("30/minute")
 def get_shops_list(
     request: Request,

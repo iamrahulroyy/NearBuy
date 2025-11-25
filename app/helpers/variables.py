@@ -3,11 +3,13 @@ from dotenv import load_dotenv
 
 load_dotenv(override=True)
 
-DATABASE_URL = getenv("DATABASE_URL")
+DATABASE_URL = getenv("DATABASE_URL", "")
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL is not set in the environment variables")
 COOKIE_KEY = getenv("COOKIE_KEY")
 TYPESENSE_HOST = getenv("TYPESENSE_HOST")
-TYPESENSE_PORT = int(getenv("TYPESENSE_PORT"))
+TYPESENSE_PORT = int(getenv("TYPESENSE_PORT", "8108"))
 TYPESENSE_PROTOCOL = getenv("TYPESENSE_PROTOCOL")
 TYPESENSE_API_KEY = getenv("TYPESENSE_API_KEY")
 REDIS_HOST = getenv("REDIS_HOST")
-REDIS_PORT = int(getenv("REDIS_PORT"))
+REDIS_PORT = int(getenv("REDIS_PORT", "6379"))

@@ -247,6 +247,7 @@ def generate_fake_data(db: Session, shops_count: int = 200, items_per_shop: int 
             longitude=lon
         )
         db.add(shop)
+        db.commit() # Commit shop to ensure ID exists for items
         generated_shops.append(shop)
         shops_created += 1
         
@@ -279,8 +280,7 @@ def generate_fake_data(db: Session, shops_count: int = 200, items_per_shop: int 
             
         # Commit in batches of 50 shops to avoid massive transaction
         if shops_created % 50 == 0:
-            db.commit()
-            print(f"  ...Committed {shops_created} shops so far.")
+            print(f"  ...Created {shops_created} shops so far.")
 
     db.commit()
     print(f"Successfully generated {len(generated_shops)} shops and {len(generated_items)} items across India.")
