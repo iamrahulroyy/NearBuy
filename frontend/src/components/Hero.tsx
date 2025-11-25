@@ -65,25 +65,25 @@ const Hero = ({ onSearch, radius, onRadiusChange }: HeroProps) => {
                 {/* Glass Card Container */}
                 <div className="bg-white/70 backdrop-blur-xl border border-white/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-3xl p-6 md:p-10">
 
-                    {/* Unified Search Block */}
-                    <div className="max-w-3xl mx-auto mb-10">
-                        <div className="bg-white rounded-full shadow-[0_4px_20px_rgb(0,0,0,0.08)] flex items-center border border-gray-100 p-2 hover:shadow-[0_8px_25px_rgb(0,0,0,0.12)] transition-all duration-300">
+                    {/* Unified Search Block - Liquid Display */}
+                    <div className="max-w-3xl mx-auto mb-10 relative z-20">
+                        <div className="liquid-display flex items-center p-2">
 
-                            {/* Radius Selector */}
+                            {/* Radius Selector - Apple Liquid Glass */}
                             <div className="relative" ref={radiusRef}>
                                 <button
                                     onClick={() => setIsRadiusOpen(!isRadiusOpen)}
-                                    className="flex items-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 font-semibold px-5 py-3 rounded-full transition-colors ml-1"
+                                    className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-slate-800 font-bold px-6 py-3 rounded-full ml-1 transition-colors"
                                 >
-                                    <SlidersHorizontal className="w-4 h-4" />
+                                    <SlidersHorizontal className="w-4 h-4 text-slate-700" />
                                     <span className="whitespace-nowrap">{radius} km</span>
-                                    <ChevronDown className={`w-4 h-4 transition-transform ${isRadiusOpen ? 'rotate-180' : ''}`} />
+                                    <ChevronDown className={`w-4 h-4 text-slate-700 transition-transform ${isRadiusOpen ? 'rotate-180' : ''}`} />
                                 </button>
 
                                 {/* Dropdown */}
                                 {isRadiusOpen && (
-                                    <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden py-2 animate-in fade-in zoom-in-95 duration-200 z-50">
-                                        <div className="px-4 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Search Radius</div>
+                                    <div className="absolute top-full left-0 mt-4 w-56 liquid-display overflow-hidden py-3 animate-in fade-in zoom-in-95 duration-200 z-50">
+                                        <div className="px-5 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Search Radius</div>
                                         {[1, 5, 10, 25, 50].map((r) => (
                                             <button
                                                 key={r}
@@ -91,11 +91,11 @@ const Hero = ({ onSearch, radius, onRadiusChange }: HeroProps) => {
                                                     onRadiusChange(r);
                                                     setIsRadiusOpen(false);
                                                 }}
-                                                className={`w-full text-left px-4 py-2.5 text-sm font-medium transition-colors flex items-center justify-between ${radius === r ? 'bg-orange-50 text-[#FF6B35]' : 'text-gray-600 hover:bg-gray-50'
+                                                className={`w-full text-left px-5 py-3 text-sm font-bold transition-colors flex items-center justify-between ${radius === r ? 'bg-orange-50 text-[#FF6B35]' : 'text-gray-600 hover:bg-gray-50'
                                                     }`}
                                             >
                                                 <span>{r} km</span>
-                                                {radius === r && <div className="w-2 h-2 rounded-full bg-[#FF6B35]" />}
+                                                {radius === r && <div className="w-2 h-2 rounded-full bg-[#FF6B35] shadow-[0_0_10px_#FF6B35]" />}
                                             </button>
                                         ))}
                                     </div>
@@ -104,24 +104,26 @@ const Hero = ({ onSearch, radius, onRadiusChange }: HeroProps) => {
 
                             {/* Search Input */}
                             <div className="flex-1 flex items-center px-4">
-                                <Search className="w-6 h-6 text-gray-400 mr-3" />
+                                <Search className="w-6 h-6 text-gray-500 mr-3" />
                                 <input
                                     type="text"
                                     placeholder="Search for items..."
-                                    className="flex-1 bg-transparent border-none outline-none text-gray-900 placeholder:text-gray-400 h-12 text-lg w-full font-medium"
+                                    className="flex-1 bg-transparent border-none outline-none text-gray-900 placeholder:text-gray-500 h-12 text-lg w-full font-medium"
                                     value={query}
                                     onChange={(e) => setQuery(e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                                 />
                             </div>
 
-                            {/* GO Button */}
-                            <button
-                                onClick={() => handleSearch()}
-                                className="bg-[#FF6B35] hover:bg-[#FF5722] text-white rounded-full px-8 md:px-10 py-3 md:py-4 font-bold text-lg transition-all shadow-lg shadow-orange-500/20 hover:scale-105 active:scale-95"
-                            >
-                                GO
-                            </button>
+                            {/* GO Button - Apple Liquid Glass */}
+                            <div className="relative group">
+                                <button
+                                    onClick={() => handleSearch()}
+                                    className="apple-liquid-glass relative z-10 text-slate-900 rounded-full px-10 py-4 font-bold text-lg"
+                                >
+                                    <span className="relative z-10">GO</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
 

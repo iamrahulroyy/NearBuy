@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { UserRole } from '@/types/auth';
-import { Menu, X, ShoppingBag, User, LogOut, ChevronDown } from 'lucide-react';
+import { Menu, X, ShoppingBag, User, LogOut, ChevronDown, Github } from 'lucide-react';
 import { useState } from 'react';
 
 const Navbar = () => {
@@ -39,11 +39,22 @@ const Navbar = () => {
                             <Link href="/about" className="text-gray-500 hover:text-black text-sm font-medium transition-colors">
                                 About us
                             </Link>
+
                         </div>
                     </div>
 
                     {/* Right Side Actions */}
                     <div className="hidden md:flex items-center space-x-4">
+                        {/* GitHub Link */}
+                        <a
+                            href="https://github.com/iamrahulroyy/NearBuy"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-gray-500 hover:text-gray-900 transition-colors p-2 hover:bg-gray-100 rounded-full"
+                            title="View on GitHub"
+                        >
+                            <Github className="w-5 h-5" />
+                        </a>
                         {isAuthenticated ? (
                             <div className="flex items-center gap-4">
                                 <div className="flex items-center gap-1 text-gray-700 text-sm font-medium cursor-pointer hover:text-black transition-colors">
@@ -102,6 +113,11 @@ const Navbar = () => {
                     </div>
                 </div>
             )}
+            {/* Modern Glassy Liquid Line */}
+            <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gray-100 overflow-visible">
+                <div className="absolute -bottom-[1px] left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#FF6B35]/40 to-transparent blur-[1px]"></div>
+                <div className="absolute -bottom-4 left-0 w-full h-8 bg-gradient-to-r from-transparent via-[#FF6B35]/5 to-transparent blur-xl opacity-0 hover:opacity-100 transition-opacity duration-700"></div>
+            </div>
         </nav>
     );
 };

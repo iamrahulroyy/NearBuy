@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: var(--font-poppins);
+  --font-sans: var(--font-inter);
 }
 
 :root {
@@ -10,13 +10,15 @@
   --foreground: #1A1A1A;
   --card: #ffffff;
   --card-foreground: #1A1A1A;
-  --primary: #FF6B35; /* Orange accent */
+  --primary: #FF6B35;
+  /* Orange accent */
   --primary-foreground: #ffffff;
   --secondary: #F3F4F6;
   --secondary-foreground: #1F2937;
   --muted: #F3F4F6;
   --muted-foreground: #6B7280;
-  --accent: #FFF5F2; /* Light orange tint */
+  --accent: #FFF5F2;
+  /* Light orange tint */
   --accent-foreground: #FF6B35;
   --destructive: #EF4444;
   --destructive-foreground: #ffffff;
@@ -59,6 +61,131 @@ body {
   transition-property: color, background-color, border-color;
   transition-duration: 200ms;
   transition-timing-function: ease-in-out;
+}
+
+/* Liquid Drop / Gooey Effect Utilities */
+.gooey-filter {
+  filter: url('#gooey');
+}
+
+@keyframes morph-blob {
+  0% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    transform: scale(1);
+  }
+
+  50% {
+    border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+    transform: scale(1.1);
+  }
+
+  100% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    transform: scale(1);
+  }
+}
+
+.animate-morph-blob {
+  animation: morph-blob 4s ease-in-out infinite;
+}
+
+@keyframes liquid-shape-morph {
+  0% {
+    border-radius: 60px 40px 50px 40px / 40px 50px 40px 60px;
+  }
+
+  33% {
+    border-radius: 40px 60px 40px 50px / 50px 40px 60px 40px;
+  }
+
+  66% {
+    border-radius: 50px 40px 60px 40px / 40px 60px 50px 40px;
+  }
+
+  100% {
+    border-radius: 60px 40px 50px 40px / 40px 50px 40px 60px;
+  }
+}
+
+.animate-liquid-shape {
+  animation: liquid-shape-morph 8s ease-in-out infinite;
+}
+
+.hyper-glass {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow:
+    0 8px 32px 0 rgba(31, 38, 135, 0.1),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+}
+
+.apple-liquid-glass {
+  /* Ethereal Blue/Purple Gradient Base */
+  background: linear-gradient(135deg, rgba(130, 180, 255, 0.25), rgba(220, 160, 255, 0.15));
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+
+  /* Refractive Border */
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-top: 1px solid rgba(255, 255, 255, 0.8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+
+  /* Deep Caustic Shadow & Inner Glow */
+  box-shadow:
+    0 15px 35px rgba(50, 50, 93, 0.15),
+    0 5px 15px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 0 20px rgba(255, 255, 255, 0.1);
+
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.apple-liquid-glass:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow:
+    0 20px 40px rgba(50, 50, 93, 0.2),
+    0 8px 20px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 0 30px rgba(255, 255, 255, 0.2);
+  background: linear-gradient(135deg, rgba(130, 180, 255, 0.35), rgba(220, 160, 255, 0.25));
+}
+
+.apple-liquid-glass::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.4), transparent);
+  border-radius: 9999px 9999px 40% 40%;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.liquid-display {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 3rem;
+  /* Large pill shape */
+  box-shadow:
+    0 20px 40px -10px rgba(0, 0, 0, 0.08),
+    0 10px 20px -5px rgba(0, 0, 0, 0.04),
+    0 0 0 1px rgba(0, 0, 0, 0.02);
+  /* Subtle border ring */
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.liquid-display:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.12),
+    0 12px 24px -6px rgba(0, 0, 0, 0.06),
+    0 0 0 1px rgba(0, 0, 0, 0.02);
 }
 
 @import 'leaflet/dist/leaflet.css';

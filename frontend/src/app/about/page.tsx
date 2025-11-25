@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { MapPin, Heart, Users, TrendingUp, ArrowRight } from 'lucide-react';
 
 export default function AboutPage() {
@@ -85,27 +86,25 @@ export default function AboutPage() {
                 </div>
             </section>
 
-            {/* Stats Section */}
+            {/* Animated Stats Section */}
             <section className="py-24 bg-slate-50 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
-                <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
+                {/* Growth Curve SVG Background */}
+                <svg className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-20" viewBox="0 0 1000 300" preserveAspectRatio="none">
+                    <path d="M0,300 C300,300 500,100 1000,0 L1000,300 Z" fill="url(#growthGradient)" />
+                    <defs>
+                        <linearGradient id="growthGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stopColor="#FF6B35" stopOpacity="0" />
+                            <stop offset="100%" stopColor="#FF6B35" stopOpacity="0.5" />
+                        </linearGradient>
+                    </defs>
+                </svg>
 
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
-                        {[
-                            { icon: MapPin, value: '19+', label: 'Cities Covered' },
-                            { icon: Users, value: '200+', label: 'Partner Shops' },
-                            { icon: Heart, value: '10k+', label: 'Happy Users' },
-                            { icon: TrendingUp, value: '100%', label: 'Local Growth' }
-                        ].map((stat, idx) => (
-                            <div key={idx} className="text-center">
-                                <div className="flex justify-center mb-4">
-                                    <stat.icon className="w-8 h-8 text-[#FF6B35] opacity-80" />
-                                </div>
-                                <div className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-2 tracking-tight">{stat.value}</div>
-                                <div className="text-sm font-bold text-slate-400 uppercase tracking-wider">{stat.label}</div>
-                            </div>
-                        ))}
+                        <StatCard number="19" suffix="+" label="Cities Covered" delay={0} />
+                        <StatCard number="200" suffix="+" label="Partner Shops" delay={100} />
+                        <StatCard number="10" suffix="k+" label="Happy Users" delay={200} />
+                        <StatCard number="100" suffix="%" label="Local Growth" delay={300} />
                     </div>
                 </div>
             </section>
@@ -132,3 +131,42 @@ export default function AboutPage() {
         </div>
     );
 }
+
+// Simple animated counter component
+const StatCard = ({ number, suffix, label, delay }: { number: string, suffix: string, label: string, delay: number }) => {
+    const [count, setCount] = useState(0);
+    const target = parseInt(number);
+
+    useEffect(() => {
+        const duration = 3000;
+        const steps = 60;
+        const stepTime = duration / steps;
+        let current = 0;
+
+        const timer = setTimeout(() => {
+            const interval = setInterval(() => {
+                current += target / steps;
+                if (current >= target) {
+                    setCount(target);
+                    clearInterval(interval);
+                } else {
+                    setCount(Math.ceil(current));
+                }
+            }, stepTime);
+            return () => clearInterval(interval);
+        }, delay);
+
+        return () => clearTimeout(timer);
+    }, [target, delay]);
+
+    return (
+        <div className="liquid-display bg-white p-6 flex flex-col items-center justify-center text-center h-40 hover:scale-105 transition-transform duration-300">
+            <div className="text-4xl font-bold text-slate-900 mb-2 font-inter">
+                {count}{suffix}
+            </div>
+            <div className="text-sm text-slate-500 font-medium uppercase tracking-wide">
+                {label}
+            </div>
+        </div>
+    );
+};
