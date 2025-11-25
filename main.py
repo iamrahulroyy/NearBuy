@@ -41,6 +41,8 @@ origins = [
     "http://10.0.0.204:8000",
     # For development: allow any localhost port
     "http://127.0.0.1:3000",
+    "https://near-buy-two.vercel.app/",
+    "https://near-buy-two.vercel.app"
 ]
 
 app.add_middleware(
