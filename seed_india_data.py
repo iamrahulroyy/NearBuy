@@ -59,9 +59,9 @@ SHOP_TYPES = [
 ]
 
 ITEM_TEMPLATES = {
-    "Electronics": [("Smartphone", 15000), ("Laptop", 45000), ("Headphones", 2000), ("Smartwatch", 3500)],
+    "Electronics": [("Smartphone", 15000), ("Laptop", 45000), ("Headphones", 2000), ("Smartwatch", 3500), ("Batteries", 50), ("Chargers", 500)],
     "Fashion": [("T-Shirt", 500), ("Jeans", 1200), ("Saree", 2500), ("Sneakers", 1800)],
-    "Grocery": [("Rice (5kg)", 300), ("Wheat Flour (5kg)", 250), ("Cooking Oil (1L)", 150), ("Spices Pack", 100)],
+    "Grocery": [("Rice (5kg)", 300), ("Wheat Flour (5kg)", 250), ("Cooking Oil (1L)", 150), ("Spices Pack", 100), ("Milk (1L)", 60)],
     "Handicrafts": [("Pottery Vase", 800), ("Handwoven Rug", 3000), ("Wooden Toy", 400), ("Brass Lamp", 1200)],
     "Books": [("Fiction Novel", 400), ("Notebook Set", 150), ("Pen Set", 100), ("Art Supplies", 600)],
     "Furniture": [("Study Table", 3500), ("Office Chair", 4500), ("Bookshelf", 2500), ("Bean Bag", 1500)],
@@ -82,11 +82,19 @@ async def seed_data():
         for city, (base_lat, base_lon) in cities.items():
             print(f"Seeding data for {city}, {state}...")
             
-            # Create 3-5 shops per city
-            num_shops = random.randint(3, 5)
+            # Create 4-5 shops per city
+            # First shop is ALWAYS grocery, second is ALWAYS electronics
+            num_shops = random.randint(4, 5)
             
             for i in range(num_shops):
-                shop_type, shop_name_suffix, shop_desc_suffix = random.choice(SHOP_TYPES)
+                if i == 0:
+                    # First shop is always grocery to ensure rice/milk/cooking oil availability
+                    shop_type, shop_name_suffix, shop_desc_suffix = "Grocery", "Daily Fresh", "Fresh groceries daily"
+                elif i == 1:
+                    # Second shop is always electronics to ensure batteries/chargers/headphones availability
+                    shop_type, shop_name_suffix, shop_desc_suffix = "Electronics", "Gadgets & Gear", "Best electronics in town"
+                else:
+                    shop_type, shop_name_suffix, shop_desc_suffix = random.choice(SHOP_TYPES)
                 
                 # Randomize location slightly around the city center (approx within 5-10km)
                 lat_offset = random.uniform(-0.05, 0.05)
@@ -146,8 +154,36 @@ async def seed_data():
 
                 # 3. Create Items for the Shop
                 items = ITEM_TEMPLATES.get(shop_type, [])
-                # Add 2-4 items per shop
-                selected_items = random.sample(items, min(len(items), random.randint(2, 4)))
+                
+                # For grocery shops, ensure essential items are always included
+                if shop_type == "Grocery":
+                    # Essential grocery items: Rice, Milk, Cooking Oil
+                    essential_items = [
+                        ("Rice (5kg)", 300),
+                        ("Milk (1L)", 60),
+                        ("Cooking Oil (1L)", 150)
+                    ]
+                    other_items = [item for item in items if item not in essential_items]
+                    # Add essential items plus 1-2 other random items
+                    num_additional = random.randint(1, min(2, len(other_items)))
+                    selected_items = essential_items + random.sample(other_items, num_additional)
+                
+                # For electronics shops, ensure essential items are always included
+                elif shop_type == "Electronics":
+                    # Essential electronics items: Batteries, Chargers, Headphones
+                    essential_items = [
+                        ("Batteries", 50),
+                        ("Chargers", 500),
+                        ("Headphones", 2000)
+                    ]
+                    other_items = [item for item in items if item not in essential_items]
+                    # Add essential items plus 1-3 other random items
+                    num_additional = random.randint(1, min(3, len(other_items)))
+                    selected_items = essential_items + random.sample(other_items, num_additional)
+                
+                else:
+                    # For other shop types, select 2-4 items randomly as before
+                    selected_items = random.sample(items, min(len(items), random.randint(2, 4)))
                 
                 for item_name, base_price in selected_items:
                     statement = select(ITEM).where(ITEM.itemName == item_name, ITEM.shop_id == shop_id)

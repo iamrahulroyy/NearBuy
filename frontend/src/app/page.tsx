@@ -137,7 +137,6 @@ export default function Home() {
             {!loading && shops.length === 0 && (
               <div className="text-center py-20 bg-slate-50 rounded-3xl">
                 <p className="text-xl text-slate-500 font-medium">No shops found matching your search.</p>
-                <p className="text-slate-400 mt-2">Try searching for "batteries", "rice", or "smartphone".</p>
               </div>
             )}
           </>
