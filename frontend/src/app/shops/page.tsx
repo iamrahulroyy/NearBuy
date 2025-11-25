@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import { MapPin, Phone, Clock, Navigation, Filter, Store } from 'lucide-react';
@@ -32,7 +32,7 @@ const INDIAN_CITIES = [
     "Thiruvananthapuram", "Udaipur", "Varanasi", "Vijayawada", "Visakhapatnam"
 ].sort();
 
-export default function ShopsPage() {
+function ShopsContent() {
     const searchParams = useSearchParams();
     const categoryParam = searchParams.get('category');
 
@@ -196,5 +196,17 @@ export default function ShopsPage() {
                 )}
             </section>
         </div>
+    );
+}
+
+export default function ShopsPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-white flex items-center justify-center">
+                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#FF6B35]"></div>
+            </div>
+        }>
+            <ShopsContent />
+        </Suspense>
     );
 }
