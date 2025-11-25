@@ -14,6 +14,7 @@ from app.api.v1.endpoints.statusApi import status_router
 from app.api.v1.endpoints.vendorApi import vendor_router 
 from app.api.v1.endpoints.categoriesApi import categories_router
 from app.api.v1.endpoints.shopsListApi import shops_list_router
+from app.api.v1.endpoints.adminApi import admin_router
 from typesense_helper.typesense_client import create_collections 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -54,7 +55,7 @@ app.add_middleware(
 )
 
 app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler) # type: ignore
 
 app.include_router(user_router, prefix="/api/v1")
 app.include_router(shop_router, prefix="/api/v1")
@@ -65,6 +66,7 @@ app.include_router(status_router, prefix="/api/v1")
 app.include_router(vendor_router, prefix="/api/v1")
 app.include_router(categories_router, prefix="/api/v1/categories")
 app.include_router(shops_list_router, prefix="/api/v1/public/shops")
+app.include_router(admin_router, prefix="/api/v1")
 
 
 @app.get("/")
