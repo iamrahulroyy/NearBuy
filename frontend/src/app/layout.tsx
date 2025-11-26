@@ -15,6 +15,7 @@ export const metadata: Metadata = {
 
 import { AuthProvider } from "@/context/AuthContext";
 import Navbar from "@/components/Navbar";
+import CustomCursor from "@/components/ui/CustomCursor";
 
 export default function RootLayout({
   children,
@@ -24,7 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} antialiased bg-white`}
+        className={`${inter.variable} antialiased bg-white cursor-none`}
       >
         {/* SVG Filter for Gooey Effect */}
         <svg style={{ position: 'absolute', width: 0, height: 0 }}>
@@ -39,6 +40,7 @@ export default function RootLayout({
             <feComposite in="SourceGraphic" in2="gooey" operator="atop" />
           </filter>
         </svg>
+        <CustomCursor />
         <AuthProvider>
           <Navbar />
           <main className="min-h-screen">

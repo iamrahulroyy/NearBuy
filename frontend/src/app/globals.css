@@ -189,3 +189,16 @@ body {
 }
 
 @import 'leaflet/dist/leaflet.css';
+
+.cursor-none {
+  cursor: none !important;
+}
+
+a,
+button,
+[role="button"],
+input,
+textarea,
+select {
+  cursor: none !important;
+}
