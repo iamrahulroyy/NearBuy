@@ -58,7 +58,7 @@ const Hero = ({ onSearch, radius, onRadiusChange }: HeroProps) => {
                         Find what you need in <span className="text-[#FF6B35]">shops near you</span>.
                     </h1>
                     <p className="text-sm md:text-lg text-slate-500 max-w-2xl mx-auto px-2">
-                        Search for products, browse local inventories, and find the best deals in your neighborhood.
+                        Search products, check real-time local stock, and spot the best deals around you.
                     </p>
                 </div>
 

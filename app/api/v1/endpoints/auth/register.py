@@ -1,5 +1,6 @@
 import traceback
 import time
+import uuid
 from fastapi import Request, status
 from fastapi.encoders import jsonable_encoder
 from sqlmodel import Session
@@ -8,6 +9,7 @@ from app.db.schemas.user import Register_STATE_CONTRIBUTER, Register_User, Regis
 from app.db.session import DB
 from app.helpers.helpers import get_fastApi_req_data, send_json_response
 from app.helpers.loginHelper import security
+from app.helpers import variables
 
 uDB = DB()
 
@@ -61,8 +63,38 @@ async def user_signup(request: Request, data: Register_User, db_pool: Session):
         
         serialized_inserted_user.pop("id", None)
 
+        # Create session and auto-login
+        token = str(uuid.uuid4())
+        max_age = 3600 * 24 * 30  # 30 days
+        expiry = int(time.time() + max_age)
+        
+        role_value = UserRole.USER.value
+        
+        session_data = {
+            "pk": token,
+            "email": email,
+            "ip": apiData.ip,
+            "browser": apiData.browser,
+            "os": apiData.os,
+            "created_at": int(time.time()),
+            "expired_at": expiry,
+            "role": role_value
+        }
+        
+        await uDB.insert(dbClassNam=UserTableEnum.USER_SESSION, data=session_data, db_pool=db_pool)
+
         db_pool.commit()
-        return send_json_response(message="User registered successfully", status=status.HTTP_201_CREATED, body=serialized_inserted_user)
+        
+        response = send_json_response(message="User registered successfully", status=status.HTTP_201_CREATED, body=serialized_inserted_user)
+        response.set_cookie(
+            key=variables.COOKIE_KEY,
+            value=token,
+            max_age=max_age,
+            httponly=True,
+            secure=False,
+            samesite="lax"
+        )
+        return response
         
     except Exception as e:
         print("Exception caught at User Signup: ", str(e))
@@ -142,9 +174,38 @@ async def vendor_signup(request: Request, data: Register_Vendor, db_pool: Sessio
         
         serialized_inserted_vendor.pop("id", None)
 
-        db_pool.commit()
+        # Create session and auto-login
+        token = str(uuid.uuid4())
+        max_age = 3600 * 24 * 30  # 30 days
+        expiry = int(time.time() + max_age)
+        
+        role_value = UserRole.VENDOR.value
+        
+        session_data = {
+            "pk": token,
+            "email": email,
+            "ip": apiData.ip,
+            "browser": apiData.browser,
+            "os": apiData.os,
+            "created_at": int(time.time()),
+            "expired_at": expiry,
+            "role": role_value
+        }
+        
+        await uDB.insert(dbClassNam=UserTableEnum.USER_SESSION, data=session_data, db_pool=db_pool)
 
-        return send_json_response(message="Vendor registered successfully", status=status.HTTP_201_CREATED, body=serialized_inserted_vendor)
+        db_pool.commit()
+        
+        response = send_json_response(message="Vendor registered successfully", status=status.HTTP_201_CREATED, body=serialized_inserted_vendor)
+        response.set_cookie(
+            key=variables.COOKIE_KEY,
+            value=token,
+            max_age=max_age,
+            httponly=True,
+            secure=False,
+            samesite="lax"
+        )
+        return response
         
     except Exception as e:
         print("Exception caught at Vendor Signup: ", str(e))

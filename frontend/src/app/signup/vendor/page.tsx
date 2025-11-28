@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { UserRole } from '@/types/auth';
 import { Store, ArrowLeft } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 
 const vendorSignupSchema = z.object({
     fullName: z.string().min(2, 'Full name is required'),
@@ -23,6 +24,7 @@ type VendorSignupFormValues = z.infer<typeof vendorSignupSchema>;
 
 export default function VendorSignupPage() {
     const router = useRouter();
+    const { checkAuth } = useAuth();
     const [error, setError] = useState<string | null>(null);
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<VendorSignupFormValues>({
         resolver: zodResolver(vendorSignupSchema),
@@ -35,7 +37,10 @@ export default function VendorSignupPage() {
                 ...data,
                 role: UserRole.VENDOR,
             });
-            router.push('/login');
+            // After successful signup, check auth to update context
+            await checkAuth();
+            // Redirect to dashboard for vendors
+            router.push('/dashboard');
         } catch (err: any) {
             setError(err.response?.data?.message || 'Signup failed. Please try again.');
         }

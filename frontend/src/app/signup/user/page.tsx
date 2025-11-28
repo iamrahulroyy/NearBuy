@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { UserRole } from '@/types/auth';
 import { UserPlus, ArrowLeft } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 
 const signupSchema = z.object({
     fullName: z.string().min(2, 'Full name is required'),
@@ -20,6 +21,7 @@ type SignupFormValues = z.infer<typeof signupSchema>;
 
 export default function UserSignupPage() {
     const router = useRouter();
+    const { checkAuth } = useAuth();
     const [error, setError] = useState<string | null>(null);
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<SignupFormValues>({
         resolver: zodResolver(signupSchema),
@@ -32,7 +34,10 @@ export default function UserSignupPage() {
                 ...data,
                 role: UserRole.USER,
             });
-            router.push('/login');
+            // After successful signup, check auth to update context
+            await checkAuth();
+            // Redirect to home for regular users
+            router.push('/');
         } catch (err: any) {
             setError(err.response?.data?.message || 'Signup failed. Please try again.');
         }
