@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { MapPin, Sparkles } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import Hero from '@/components/Hero';
 import ShopCard from '@/components/ShopCard';
 import MapModal from '@/components/MapModal';
+import LocationRequest from '@/components/LocationRequest';
 import { searchNearby } from '@/services/api';
 import { Shop } from '@/types';
 
@@ -16,30 +17,60 @@ export default function Home() {
   const [selectedRadius, setSelectedRadius] = useState(5); // Default 5km
   const resultsRef = useRef<HTMLElement>(null);
 
-  // Default location (Agartala, Tripura)
-  const [location, setLocation] = useState<{ lat: number; lng: number }>({ lat: 23.8315, lng: 91.2868 });
+  // Location State
+  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [showLocationPrompt, setShowLocationPrompt] = useState(false);
 
   useEffect(() => {
-    // Try to get user's location
+    // Check if we already have a location saved in session
+    const savedLoc = localStorage.getItem('user_location');
+    if (savedLoc) {
+      setLocation(JSON.parse(savedLoc));
+    } else {
+      // Only show prompt if we don't have a location
+      setShowLocationPrompt(true);
+    }
+  }, []);
+
+  const handleAllowLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          setLocation({
+          const newLoc = {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
-          });
+          };
+          setLocation(newLoc);
+          localStorage.setItem('user_location', JSON.stringify(newLoc));
+          setShowLocationPrompt(false);
         },
         (error) => {
-          console.log("Geolocation permission denied or error, using default (Agartala, Tripura)");
+          console.error("Geolocation error:", error);
+          // If denied by browser after clicking allow, maybe show manual picker or default
+          // For now, we'll fall back to default but keep the prompt hidden or show an error
+          alert("Could not get location. Please enable it in your browser settings.");
+          // Optionally fall back to default location
+          handleDenyLocation();
         }
       );
+    } else {
+      alert("Geolocation is not supported by this browser.");
+      handleDenyLocation();
     }
+  };
 
-    // Initial load - no auto search to show chips
-    // handleSearch('batteries');
-  }, []);
+  const handleDenyLocation = () => {
+    // User denied or error. Set default location (Agartala)
+    const defaultLoc = { lat: 23.8315, lng: 91.2868 };
+    setLocation(defaultLoc);
+    setShowLocationPrompt(false);
+    // We don't save default location to localStorage so we ask again next time? 
+    // Or maybe we do. Let's not save it so they have a chance to allow next time.
+  };
 
   const handleSearch = async (query: string, radius?: number) => {
+    if (!location) return;
+
     setLoading(true);
     setSearchQuery(query);
 
@@ -61,7 +92,6 @@ export default function Home() {
 
   const handleDistanceChange = (distance: number) => {
     setSelectedRadius(distance);
-    // Re-run search with new distance if there's an active query
     if (searchQuery) {
       handleSearch(searchQuery, distance);
     }
@@ -69,18 +99,18 @@ export default function Home() {
 
   const handleMapClick = (lat: number, lng: number) => {
     setLocation({ lat, lng });
-    // Optional: Trigger search immediately or just update location context
     if (searchQuery) {
       handleSearch(searchQuery);
     }
   };
 
-  const handleSuggestionClick = (suggestion: string) => {
-    handleSearch(suggestion);
-  };
-
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-white relative">
+      {/* Location Permission Modal Overlay */}
+      {showLocationPrompt && (
+        <LocationRequest onAllow={handleAllowLocation} onDeny={handleDenyLocation} />
+      )}
+
       <Hero
         onSearch={(q) => handleSearch(q)}
         radius={selectedRadius}
@@ -89,23 +119,14 @@ export default function Home() {
 
       {/* Shops Section */}
       <section ref={resultsRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-
-        {!searchQuery ? (
-          <div className="py-8">
-            {/* Empty state or additional marketing content could go here if needed, 
-                 but for now we keep it clean as the Hero handles the main call to action. 
-                 We can leave this empty or remove the conditional entirely if we want 
-                 the shops list to be the only thing below hero. 
-                 Actually, let's just show nothing here so the page is clean. */}
-          </div>
-        ) : (
+        {searchQuery && (
           <>
-            <div className="flex justify-between items-end mb-8">
-              <div>
-                <h2 className="text-3xl font-bold text-slate-900 mb-2">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-4 mb-8">
+              <div className="flex-1">
+                <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">
                   Results for "{searchQuery}"
                 </h2>
-                <p className="text-slate-500">
+                <p className="text-sm md:text-base text-slate-500">
                   {shops.length > 0
                     ? `Found ${shops.length} shops near you`
                     : 'Search for items to find shops'}
@@ -113,11 +134,11 @@ export default function Home() {
               </div>
               <button
                 onClick={() => setIsMapOpen(true)}
-                className="flex items-center gap-2 text-[#FF6B35] font-bold hover:underline"
+                className="flex items-center justify-center gap-2 text-[#FF6B35] font-bold hover:underline bg-orange-50 hover:bg-orange-100 px-4 py-2.5 rounded-full transition-colors self-start md:self-auto"
                 disabled={shops.length === 0}
               >
-                <MapPin className="w-5 h-5" />
-                View on Map
+                <MapPin className="w-4 h-4 md:w-5 md:h-5" />
+                <span className="text-sm md:text-base">View on Map</span>
               </button>
             </div>
             {loading ? (
@@ -148,7 +169,7 @@ export default function Home() {
         isOpen={isMapOpen}
         onClose={() => setIsMapOpen(false)}
         shops={shops}
-        center={[location.lat, location.lng]}
+        center={location ? [location.lat, location.lng] : [23.8315, 91.2868]}
         onMapClick={handleMapClick}
       />
     </main>

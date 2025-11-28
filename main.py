@@ -43,7 +43,9 @@ origins = [
     # For development: allow any localhost port
     "http://127.0.0.1:3000",
     "https://near-buy-two.vercel.app/",
-    "https://near-buy-two.vercel.app"
+    "https://near-buy-two.vercel.app",
+    "https://nearbuy.firebit.in/",
+    "https://nearbuy.firebit.in"
 ]
 
 app.add_middleware(
