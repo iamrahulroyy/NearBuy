@@ -95,28 +95,28 @@ const Navbar = () => {
             {isOpen && (
                 <div className="md:hidden bg-white border-t border-gray-100 absolute w-full shadow-xl">
                     <div className="px-4 pt-2 pb-4 space-y-1">
-                        <Link href="/" className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-black hover:bg-gray-50 rounded-md">
+                        <Link href="/" onClick={() => setIsOpen(false)} className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-black hover:bg-gray-50 rounded-md">
                             Explore
                         </Link>
-                        <Link href="/categories" className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-black hover:bg-gray-50 rounded-md">
+                        <Link href="/categories" onClick={() => setIsOpen(false)} className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-black hover:bg-gray-50 rounded-md">
                             Categories
                         </Link>
-                        <Link href="/shops" className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-black hover:bg-gray-50 rounded-md">
+                        <Link href="/shops" onClick={() => setIsOpen(false)} className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-black hover:bg-gray-50 rounded-md">
                             Shops
                         </Link>
-                        <Link href="/about" className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-black hover:bg-gray-50 rounded-md">
+                        <Link href="/about" onClick={() => setIsOpen(false)} className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-black hover:bg-gray-50 rounded-md">
                             About us
                         </Link>
                         {isAuthenticated ? (
-                            <button onClick={() => logout()} className="w-full text-left block px-3 py-2 text-base font-medium text-gray-700 hover:text-black hover:bg-gray-50 rounded-md">
+                            <button onClick={() => { logout(); setIsOpen(false); }} className="w-full text-left block px-3 py-2 text-base font-medium text-gray-700 hover:text-black hover:bg-gray-50 rounded-md">
                                 Logout
                             </button>
                         ) : (
                             <>
-                                <Link href="/login" className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-black hover:bg-gray-50 rounded-md">
+                                <Link href="/login" onClick={() => setIsOpen(false)} className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-black hover:bg-gray-50 rounded-md">
                                     Login
                                 </Link>
-                                <Link href="/signup/vendor" className="block px-3 py-2 text-base font-medium text-[#6366F1] bg-[#E8E5FF] hover:bg-[#DDD8FF] rounded-md transition-colors font-semibold">
+                                <Link href="/signup/vendor" onClick={() => setIsOpen(false)} className="block px-3 py-2 text-base font-medium text-[#6366F1] bg-[#E8E5FF] hover:bg-[#DDD8FF] rounded-md transition-colors font-semibold">
                                     Vendor Signup
                                 </Link>
                             </>
@@ -125,6 +125,7 @@ const Navbar = () => {
                             href="https://github.com/iamrahulroyy/NearBuy"
                             target="_blank"
                             rel="noopener noreferrer"
+                            onClick={() => setIsOpen(false)}
                             className="flex items-center gap-2 px-3 py-2 text-base font-medium text-gray-700 hover:text-black hover:bg-gray-50 rounded-md"
                         >
                             <Github className="w-5 h-5" />

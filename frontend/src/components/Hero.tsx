@@ -45,14 +45,14 @@ const Hero = ({ onSearch, radius, onRadiusChange }: HeroProps) => {
     ];
 
     return (
-        <section className="relative w-full bg-gradient-to-br from-orange-50 via-white to-orange-50 pt-12 md:pt-20 pb-16 md:pb-24 overflow-hidden">
+        <section data-cursor-section="hero" className="relative w-full min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 flex items-center overflow-hidden cursor-none">
             {/* Background Decorative Blobs */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
                 <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-[#FF6B35]/10 rounded-full blur-3xl animate-pulse-slow"></div>
                 <div className="absolute top-[20%] -right-[10%] w-[30%] h-[30%] bg-orange-200/20 rounded-full blur-3xl animate-pulse-slow delay-1000"></div>
             </div>
 
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full py-12">
                 <div className="text-center mb-8 md:mb-10">
                     <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-3 md:mb-4 tracking-tight leading-tight">
                         Find what you need in <span className="text-[#FF6B35]">shops near you</span>.

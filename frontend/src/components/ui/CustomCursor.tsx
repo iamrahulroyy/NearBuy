@@ -6,6 +6,8 @@ import { motion, useMotionValue, useSpring } from 'framer-motion';
 export default function CustomCursor() {
     const [isHovered, setIsHovered] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+    const [isInActiveSection, setIsInActiveSection] = useState(false);
 
     const cursorX = useMotionValue(-100);
     const cursorY = useMotionValue(-100);
@@ -15,10 +17,37 @@ export default function CustomCursor() {
     const cursorYSpring = useSpring(cursorY, springConfig);
 
     useEffect(() => {
+        // Check if device is mobile/touch device
+        const checkMobile = () => {
+            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            const isMobileWidth = window.innerWidth < 768; // md breakpoint
+            setIsMobile(isTouchDevice || isMobileWidth);
+        };
+
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+
+        // If mobile, don't show cursor
+        if (isMobile) {
+            return () => {
+                window.removeEventListener('resize', checkMobile);
+            };
+        }
+
         const moveCursor = (e: MouseEvent) => {
             cursorX.set(e.clientX);
             cursorY.set(e.clientY);
             if (!isVisible) setIsVisible(true);
+
+            // Check if cursor is over specific sections with data attribute
+            const target = e.target as HTMLElement;
+            const activeSectionElement =
+                target.closest('[data-cursor-section="hero"]') ||
+                target.closest('[data-cursor-section="content"]');
+
+            const isInSpecificSection = activeSectionElement !== null;
+
+            setIsInActiveSection(isInSpecificSection);
         };
 
         const handleMouseEnter = () => setIsHovered(true);
@@ -52,15 +81,17 @@ export default function CustomCursor() {
 
         return () => {
             window.removeEventListener('mousemove', moveCursor);
+            window.removeEventListener('resize', checkMobile);
             clickables.forEach((el) => {
                 el.removeEventListener('mouseenter', handleMouseEnter);
                 el.removeEventListener('mouseleave', handleMouseLeave);
             });
             observer.disconnect();
         };
-    }, [cursorX, cursorY, isVisible]);
+    }, [cursorX, cursorY, isVisible, isMobile]);
 
-    if (!isVisible) return null;
+    // Don't render on mobile or if not visible or not in active section
+    if (isMobile || !isVisible || !isInActiveSection) return null;
 
     return (
         <div className="pointer-events-none fixed inset-0 z-[9999] overflow-hidden">

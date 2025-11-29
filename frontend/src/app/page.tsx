@@ -104,6 +104,20 @@ export default function Home() {
     }
   };
 
+  // Control body overflow to prevent scrolling when no search results
+  useEffect(() => {
+    if (!searchQuery) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [searchQuery]);
+
   return (
     <main className="min-h-screen bg-white relative">
       {/* Location Permission Modal Overlay */}

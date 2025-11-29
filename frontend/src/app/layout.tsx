@@ -25,7 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} antialiased bg-white cursor-none`}
+        className={`${inter.variable} antialiased bg-white`}
       >
         {/* SVG Filter for Gooey Effect */}
         <svg style={{ position: 'absolute', width: 0, height: 0 }}>

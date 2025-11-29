@@ -69,7 +69,7 @@ function ShopsContent() {
     };
 
     return (
-        <div className="min-h-screen bg-white overflow-hidden">
+        <div data-cursor-section="content" className="min-h-screen bg-white overflow-hidden cursor-none">
             {/* Header */}
             <section className="relative pt-32 pb-16">
                 {/* Background Gradients */}

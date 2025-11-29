@@ -6,7 +6,7 @@ import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 
 export default function AboutPage() {
     return (
-        <div className="min-h-screen bg-white overflow-hidden">
+        <div data-cursor-section="content" className="min-h-screen bg-white overflow-hidden cursor-none">
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32">
                 {/* Background Gradients */}
