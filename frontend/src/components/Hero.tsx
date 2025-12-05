@@ -52,6 +52,12 @@ const Hero = ({ onSearch, radius, onRadiusChange }: HeroProps) => {
                 <div className="absolute top-[20%] -right-[10%] w-[30%] h-[30%] bg-orange-200/20 rounded-full blur-3xl animate-pulse-slow delay-1000"></div>
             </div>
 
+            {/* Beta Banner */}
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-orange-100/80 backdrop-blur-md border border-orange-200 text-[#FF6B35] px-4 py-1.5 rounded-full text-xs md:text-sm font-semibold shadow-sm flex items-center gap-2 whitespace-nowrap">
+                <span>🚧</span>
+                <span>Beta Version 1.1 - Currently all data is dummy</span>
+            </div>
+
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full py-12">
                 <div className="text-center mb-8 md:mb-10">
                     <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-3 md:mb-4 tracking-tight leading-tight">

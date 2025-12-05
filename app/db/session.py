@@ -2,7 +2,7 @@ from functools import wraps
 import time
 import traceback
 from typing import List, Optional, Tuple
-from fastapi import Request,status
+from fastapi import Request, status
 from fastapi.encoders import jsonable_encoder
 from sqlmodel import SQLModel, Session, create_engine, delete, func, select
 from app.db.models.inventory import INVENTORY, InventoryTableEnum
@@ -82,7 +82,7 @@ def initDB(_engine):
 class DB:
     def __init__(self):
         pass
-    
+
     @classmethod
     async def get_user(cls, data: int | str, db_pool: Session):
         try:
@@ -90,29 +90,34 @@ class DB:
                 statement = select(USER).where(USER.id == data)
             else:
                 statement = select(USER).where(USER.email == data)
-            
+
             user = db_pool.exec(statement).first()
             return user
-        
+
         except Exception as e:
             print(f"Exception in get_user: {str(e)}")
             traceback.print_exc()
             db_pool.rollback()
             return None
-        
-    @classmethod
-    async def getUserSession(self, db_pool, session_token):
-            try:
-                statement = select(USER_SESSION).where(USER_SESSION.pk == session_token)
-                user_session = db_pool.exec(statement).first()
-                # print(f"user {USER_SESSION}")
-                if user_session:
-                    return user_session
-            except:
-                return None
 
     @classmethod
-    async def insert(self, dbClassNam: str, data: dict, db_pool: Session, commit: bool = False):
+    async def getUserSession(self, db_pool, session_token):
+        try:
+            statement = select(USER_SESSION).where(USER_SESSION.pk == session_token)
+            user_session = db_pool.exec(statement).first()
+            # print(f"user {USER_SESSION}")
+            if user_session:
+                return user_session
+        except Exception as e:
+            print(f"Exception in getUserSession: {str(e)}")
+            traceback.print_exc()
+            db_pool.rollback()
+            return None
+
+    @classmethod
+    async def insert(
+        self, dbClassNam: str, data: dict, db_pool: Session, commit: bool = False
+    ):
         try:
             if dbClassNam == UserTableEnum.USER:
                 data = USER(**data)
@@ -150,7 +155,7 @@ class DB:
             db_pool.rollback()
             traceback.print_exc()
             return False
-        
+
     @classmethod
     async def delete_session_by_token(cls, db_pool, session_token: str):
         try:
@@ -163,7 +168,6 @@ class DB:
             traceback.print_exc()
             return False
 
-
     # @classmethod
     # async def get_item_by_name(self, itemName: str, db_pool: Session):
     #     try:
@@ -174,10 +178,11 @@ class DB:
     #         print(f"Exception in get_item_by_name: {str(e)}")
     #         traceback.print_exc()
     #         return None
-        
-    
+
     @classmethod
-    async def get_attr_all(self, dbClassNam: str, db_pool: Session, filters: dict = None, all=True):
+    async def get_attr_all(
+        self, dbClassNam: str, db_pool: Session, filters: dict = None, all=True
+    ):
         try:
             models = {
                 ItemTableEnum.ITEM: ITEM,
@@ -191,7 +196,7 @@ class DB:
             table = models.get(dbClassNam)
             if not table:
                 return None
-            
+
             statement = select(table)
 
             if filters and isinstance(filters, dict):
@@ -209,15 +214,17 @@ class DB:
             else:
                 result = db_pool.exec(statement).first()
             return result
-        
+
         except Exception as e:
             traceback.print_exc()
             if isinstance(db_pool, Session):
                 db_pool.rollback()
             return None
-        
+
     @classmethod
-    async def update_attr_all(cls, dbClassNam: str, data: dict, db_pool: Session, identifier: dict):
+    async def update_attr_all(
+        cls, dbClassNam: str, data: dict, db_pool: Session, identifier: dict
+    ):
         try:
             table_map = {
                 ItemTableEnum.ITEM: ITEM,
@@ -226,8 +233,6 @@ class DB:
                 UserTableEnum.USER_SESSION: USER_SESSION,
                 ShopTableEnum.SHOP: SHOP,
                 InventoryTableEnum.INVENTORY: INVENTORY,
-
-                
             }
 
             table_class = table_map.get(dbClassNam)
@@ -281,8 +286,6 @@ class DB:
                 UserTableEnum.USER_SESSION: USER_SESSION,
                 ShopTableEnum.SHOP: SHOP,
                 InventoryTableEnum.INVENTORY: INVENTORY,
-
-
             }
 
             table_class = table_map.get(dbClassNam)
@@ -311,8 +314,16 @@ class DB:
             message = "Error deleting."
             return message, False
 
-    @classmethod  
-    async def get_attr_all_paginated(cls,dbClassNam,db_pool,offset: int = 0,limit: int = 20,filters: Optional[List] = None,order_by: Optional[List] = None) -> Tuple[List[dict], int]:
+    @classmethod
+    async def get_attr_all_paginated(
+        cls,
+        dbClassNam,
+        db_pool,
+        offset: int = 0,
+        limit: int = 20,
+        filters: Optional[List] = None,
+        order_by: Optional[List] = None,
+    ) -> Tuple[List[dict], int]:
         try:
             session = db_pool
             query = select(dbClassNam)
@@ -363,15 +374,16 @@ class DB:
 #                     db_pool.exec(statement)
 #                     db_pool.commit()
 #                     return send_json_response(message="Session expired. Please login again.", status=status.HTTP_401_UNAUTHORIZED, body={})
-#                 kwargs["request"].state.emp = user_session 
+#                 kwargs["request"].state.emp = user_session
 #         except Exception as e:
 #             print("Exception caught at authentication wrapper: ", str(e))
 #             if db_pool:
-#                 db_pool.rollback()  
+#                 db_pool.rollback()
 #             traceback.print_exc()
 #             return send_json_response(message="Error during authentication.", status=status.HTTP_500_INTERNAL_SERVER_ERROR, body={})
-#         return await func(*args, **kwargs) 
+#         return await func(*args, **kwargs)
 #     return wrapper
+
 
 def authentication_required(allowed_roles: List[UserRole]):
     def decorator(func):
@@ -383,13 +395,19 @@ def authentication_required(allowed_roles: List[UserRole]):
                 if not request:
                     return send_json_response(
                         message="Unable to process authentication.",
-                        status=status.HTTP_400_BAD_REQUEST, body={}
+                        status=status.HTTP_400_BAD_REQUEST,
+                        body={},
                     )
-                session_token: Optional[str] = request.cookies.get(variables.COOKIE_KEY, None)
+                session_token: Optional[str] = request.cookies.get(
+                    variables.COOKIE_KEY, None
+                )
                 if not session_token:
+                    print(f"DEBUG: Cookie key expected: {variables.COOKIE_KEY}")
+                    print(f"DEBUG: Cookies received: {request.cookies}")
                     return send_json_response(
                         message="Authentication token not provided.",
-                        status=status.HTTP_401_UNAUTHORIZED, body={}
+                        status=status.HTTP_401_UNAUTHORIZED,
+                        body={},
                     )
 
                 if db_pool:
@@ -397,44 +415,72 @@ def authentication_required(allowed_roles: List[UserRole]):
                     if not user_session:
                         return send_json_response(
                             message="Session expired or invalid. Please login again.",
-                            status=status.HTTP_401_UNAUTHORIZED, body={}
+                            status=status.HTTP_401_UNAUTHORIZED,
+                            body={},
                         )
 
                     if int(time.time()) > user_session.expired_at:
                         from sqlalchemy import delete
-                        statement = delete(USER_SESSION).where(USER_SESSION.pk == session_token)
+
+                        statement = delete(USER_SESSION).where(
+                            USER_SESSION.pk == session_token
+                        )
                         db_pool.exec(statement)
                         db_pool.commit()
                         return send_json_response(
                             message="Session expired. Please login again.",
-                            status=status.HTTP_401_UNAUTHORIZED, body={}
+                            status=status.HTTP_401_UNAUTHORIZED,
+                            body={},
                         )
 
                     user_role = getattr(user_session, "role", None)
-                    
-                    if user_role is None and isinstance(user_session, dict) and "role" in user_session:
+
+                    if (
+                        user_role is None
+                        and isinstance(user_session, dict)
+                        and "role" in user_session
+                    ):
                         user_role = user_session["role"]
                     if user_role is None:
-                        return send_json_response(message="No user role found.",status=status.HTTP_403_FORBIDDEN, body={})
-                    
-                    user_role_str = user_role.value.upper() if isinstance(user_role, UserRole) else str(user_role).upper()
+                        return send_json_response(
+                            message="No user role found.",
+                            status=status.HTTP_403_FORBIDDEN,
+                            body={},
+                        )
+
+                    user_role_str = (
+                        user_role.value.upper()
+                        if isinstance(user_role, UserRole)
+                        else str(user_role).upper()
+                    )
                     allowed_values = [
                         r.value.upper() if isinstance(r, UserRole) else str(r).upper()
                         for r in allowed_roles
                     ]
                     # print("DEBUG: user_role_str =", user_role_str, "allowed =", allowed_values)
                     if user_role_str not in allowed_values:
-                        return send_json_response(message="You do not have permission to access this resource.",status=status.HTTP_403_FORBIDDEN, body={})
+                        return send_json_response(
+                            message="You do not have permission to access this resource.",
+                            status=status.HTTP_403_FORBIDDEN,
+                            body={},
+                        )
                     kwargs["request"].state.emp = user_session
             except Exception as e:
                 # print("Exception caught at authentication wrapper: ", str(e))
                 if db_pool:
                     db_pool.rollback()
                 traceback.print_exc()
-                return send_json_response(message="Error during authentication.",status=status.HTTP_500_INTERNAL_SERVER_ERROR, body={})
+                return send_json_response(
+                    message="Error during authentication.",
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    body={},
+                )
             return await func(*args, **kwargs)
+
         return wrapper
+
     return decorator
+
 
 def ADMIN_AUTHENTICATION_ONLY(func):
     @wraps(func)
@@ -443,27 +489,58 @@ def ADMIN_AUTHENTICATION_ONLY(func):
             db_pool: Optional[Session] = kwargs.get("db_pool", None)
             request: Request = kwargs.get("request")
             if not request:
-                return send_json_response(message="Unable to process authentication.", status=status.HTTP_400_BAD_REQUEST, body={})
-            session_token: Optional[str] = request.cookies.get(variables.COOKIE_KEY, None)
+                return send_json_response(
+                    message="Unable to process authentication.",
+                    status=status.HTTP_400_BAD_REQUEST,
+                    body={},
+                )
+            session_token: Optional[str] = request.cookies.get(
+                variables.COOKIE_KEY, None
+            )
             if not session_token:
-                return send_json_response(message="Authentication token not provided.", status=status.HTTP_403_FORBIDDEN, body={})
+                print(f"DEBUG: Cookie key expected: {variables.COOKIE_KEY}")
+                print(f"DEBUG: Cookies received: {request.cookies}")
+                return send_json_response(
+                    message="Authentication token not provided.",
+                    status=status.HTTP_403_FORBIDDEN,
+                    body={},
+                )
             if db_pool:
                 user_session = await DB.getUserSession(db_pool, session_token)
                 if not user_session:
-                    return send_json_response(message="Session expired or invalid. Please login again.", status=status.HTTP_401_UNAUTHORIZED, body={})
+                    return send_json_response(
+                        message="Session expired or invalid. Please login again.",
+                        status=status.HTTP_401_UNAUTHORIZED,
+                        body={},
+                    )
                 if int(time.time()) > user_session.expired_at:
-                    statement = delete(USER_SESSION).where(USER_SESSION.pk == session_token)
+                    statement = delete(USER_SESSION).where(
+                        USER_SESSION.pk == session_token
+                    )
                     db_pool.exec(statement)
                     db_pool.commit()
-                    return send_json_response(message="Session expired. Please login again.", status=status.HTTP_401_UNAUTHORIZED, body={})
-                if user_session.role != UserRole.ADMIN: 
-                    return send_json_response(message="Insufficient privileges.", status=status.HTTP_403_FORBIDDEN, body={})
+                    return send_json_response(
+                        message="Session expired. Please login again.",
+                        status=status.HTTP_401_UNAUTHORIZED,
+                        body={},
+                    )
+                if user_session.role != UserRole.ADMIN:
+                    return send_json_response(
+                        message="Insufficient privileges.",
+                        status=status.HTTP_403_FORBIDDEN,
+                        body={},
+                    )
                 kwargs["request"].state.emp = user_session
         except Exception as e:
             print("Exception caught at admin authentication wrapper: ", str(e))
             if db_pool:
                 db_pool.rollback()
             traceback.print_exc()
-            return send_json_response(message="Error during authentication.", status=status.HTTP_500_INTERNAL_SERVER_ERROR, body={})
+            return send_json_response(
+                message="Error during authentication.",
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                body={},
+            )
         return await func(*args, **kwargs)
+
     return wrapper
