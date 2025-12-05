@@ -44,7 +44,7 @@ export default function UserSignupPage() {
     };
 
     return (
-        <div className="h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 via-white to-orange-50 relative overflow-hidden">
+        <div className="min-h-[calc(100vh-64px)] flex items-center justify-center bg-gradient-to-br from-orange-50 via-white to-orange-50 relative overflow-hidden py-8">
             {/* Decorative Background Elements */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
                 <div className="absolute -top-[20%] -right-[10%] w-[500px] h-[500px] bg-orange-200/30 rounded-full blur-3xl"></div>

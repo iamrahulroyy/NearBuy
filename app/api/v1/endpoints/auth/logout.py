@@ -1,3 +1,4 @@
+from typing import cast, Literal
 import traceback
 from fastapi import Request,status
 from sqlmodel import Session
@@ -14,7 +15,11 @@ async def logout(request:Request, db_pool: Session):
         db_pool.commit()
 
         response = send_json_response(message="Logged out successfully",status=status.HTTP_200_OK,body={})
-        response.delete_cookie(key=variables.COOKIE_KEY)
+        response.delete_cookie(
+            key=variables.COOKIE_KEY,
+            secure=variables.COOKIE_SECURE,
+            samesite=cast(Literal["lax", "strict", "none"], variables.COOKIE_SAMESITE)
+        )
         return response
     except Exception as e:
         traceback.print_exc()

@@ -1,3 +1,4 @@
+from typing import cast, Literal
 import time
 import traceback
 import uuid
@@ -86,8 +87,8 @@ async def login(request: Request, data: Login_User, db_pool: Session):
             value=token,
             max_age=max_age,
             httponly=True,
-            secure=False,
-            samesite="lax"
+            secure=variables.COOKIE_SECURE,
+            samesite=cast(Literal["lax", "strict", "none"], variables.COOKIE_SAMESITE)
         )
         return response
     except Exception as e:
