@@ -76,5 +76,15 @@ export const getSuggestions = async (
   }
 };
 
-export default api;
+// Analytics API
+export const getAnalyticsStats = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/analytics/stats`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching analytics stats:', error);
+    throw error;
+  }
+};
 
+export default api;

@@ -3,8 +3,38 @@
 import { useState, useEffect, useRef } from 'react';
 import { MapPin, Heart, Users, TrendingUp, ArrowRight, Search, Store, ShoppingBag } from 'lucide-react';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
+import { getAnalyticsStats } from '@/services/api';
 
 export default function AboutPage() {
+    const [stats, setStats] = useState({
+        cities_count: 0,
+        shops_count: 0,
+        users_count: 0,
+        items_count: 0
+    });
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const data = await getAnalyticsStats();
+                setStats({
+                    cities_count: data.cities_count || 0,
+                    shops_count: data.shops_count || 0,
+                    users_count: data.users_count || 0,
+                    items_count: data.items_count || 0
+                });
+            } catch (error) {
+                console.error('Failed to fetch analytics:', error);
+                // Keep default values if API fails
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchStats();
+    }, []);
+
     return (
         <div data-cursor-section="content" className="min-h-screen bg-white overflow-hidden cursor-none">
             {/* Hero Section */}
@@ -66,7 +96,7 @@ export default function AboutPage() {
             {/* How It Works - Redesigned */}
             <HowItWorksSection />
 
-            {/* Animated Stats Section */}
+            {/* Animated Stats Section - Real Data */}
             <section className="py-24 bg-slate-50 relative overflow-hidden">
                 {/* Growth Curve SVG Background */}
                 <svg className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-20" viewBox="0 0 1000 300" preserveAspectRatio="none">
@@ -80,12 +110,16 @@ export default function AboutPage() {
                 </svg>
 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
-                        <StatCard number="19" suffix="+" label="Cities Covered" delay={0} />
-                        <StatCard number="200" suffix="+" label="Partner Shops" delay={100} />
-                        <StatCard number="10" suffix="k+" label="Happy Users" delay={200} />
-                        <StatCard number="100" suffix="%" label="Local Growth" delay={300} />
-                    </div>
+                    {loading ? (
+                        <div className="text-center text-slate-500">Loading statistics...</div>
+                    ) : (
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
+                            <StatCard number={stats.cities_count.toString()} suffix="+" label="Cities Covered" delay={0} />
+                            <StatCard number={stats.shops_count.toString()} suffix="+" label="Partner Shops" delay={100} />
+                            <StatCard number={Math.floor(stats.users_count / 1000).toString()} suffix="k+" label="Happy Users" delay={200} />
+                            <StatCard number={stats.items_count.toString()} suffix="+" label="Products Listed" delay={300} />
+                        </div>
+                    )}
                 </div>
             </section>
 

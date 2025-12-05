@@ -232,3 +232,8 @@ venv/
 # Other
 .env
 improvements.md
+
+# Scraping folder (private endpoints and data)
+/scrapping/
+!/scrapping/*.md
+!/scrapping/requirements.txt
