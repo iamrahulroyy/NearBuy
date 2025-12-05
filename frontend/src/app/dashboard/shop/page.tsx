@@ -9,6 +9,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Loader2, MapPin } from 'lucide-react';
 
 const shopSchema = z.object({
+    fullName: z.string().min(2, 'Full name (owner/manager) is required'),
     shopName: z.string().min(2, 'Shop name is required'),
     address: z.string().min(5, 'Address is required'),
     contact: z.string().optional(),
@@ -63,6 +64,7 @@ export default function ShopManagementPage() {
                 // Pre-fill form
                 const s = response.data.body;
                 reset({
+                    fullName: s.fullName,
                     shopName: s.shopName,
                     address: s.address,
                     contact: s.contact,
@@ -148,6 +150,16 @@ export default function ShopManagementPage() {
             )}
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Owner/Manager Name</label>
+                    <input
+                        type="text"
+                        {...register('fullName')}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"
+                    />
+                    {errors.fullName && <p className="text-red-600 text-sm mt-1">{errors.fullName.message}</p>}
+                </div>
+
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Shop Name</label>
                     <input

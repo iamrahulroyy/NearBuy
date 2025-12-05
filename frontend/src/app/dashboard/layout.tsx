@@ -2,7 +2,10 @@
 
 import { LayoutDashboard, Package, Settings, ShoppingBag, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
+import { UserRole } from '@/types/auth';
+import { useEffect } from 'react';
 
 export default function DashboardLayout({
     children,
@@ -10,6 +13,15 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     const pathname = usePathname();
+    const router = useRouter();
+    const { user, isAuthenticated, isLoading } = useAuth();
+
+    // Redirect if not authenticated or not vendor/admin
+    useEffect(() => {
+        if (!isLoading && (!isAuthenticated || (user?.role !== UserRole.VENDOR && user?.role !== UserRole.ADMIN))) {
+            router.push('/login');
+        }
+    }, [isAuthenticated, user, isLoading, router]);
 
     const navItems = [
         { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
@@ -18,6 +30,20 @@ export default function DashboardLayout({
         { icon: BarChart3, label: 'Reports', href: '/dashboard/reports' },
         { icon: Settings, label: 'Settings', href: '/dashboard/settings' },
     ];
+
+    // Show loading state while checking auth
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-slate-50">
+                <div className="text-slate-600">Loading...</div>
+            </div>
+        );
+    }
+
+    // Don't render if not authenticated (will redirect)
+    if (!isAuthenticated || (user?.role !== UserRole.VENDOR && user?.role !== UserRole.ADMIN)) {
+        return null;
+    }
 
     return (
         <div className="min-h-screen bg-slate-50 flex text-slate-900 font-sans">
@@ -40,8 +66,8 @@ export default function DashboardLayout({
                                 key={item.label}
                                 href={item.href}
                                 className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive
-                                        ? 'bg-indigo-50 text-indigo-600'
-                                        : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+                                    ? 'bg-indigo-50 text-indigo-600'
+                                    : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
                                     }`}
                             >
                                 <item.icon className="w-5 h-5" />

@@ -47,7 +47,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
             await api.post('/users/login', data);
             await checkAuth();
-            router.push('/');
+            // Redirect based on user role
+            // Note: checkAuth() updates the state, but we need to wait for it
+            // For now, we'll fetch the user info again to get the role
+            const response = await api.get('/users/auth');
+            if (response.data && response.data.body) {
+                const userRole = response.data.body.role;
+                if (userRole === UserRole.VENDOR || userRole === UserRole.ADMIN) {
+                    router.push('/dashboard');
+                } else {
+                    router.push('/');
+                }
+            } else {
+                router.push('/');
+            }
         } catch (error) {
             console.error('Login failed', error);
             throw error;

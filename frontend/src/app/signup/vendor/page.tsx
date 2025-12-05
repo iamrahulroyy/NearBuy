@@ -13,9 +13,6 @@ import { useAuth } from '@/context/AuthContext';
 
 const vendorSignupSchema = z.object({
     fullName: z.string().min(2, 'Full name is required'),
-    shopName: z.string().min(2, 'Shop name is required'),
-    address: z.string().min(5, 'Address is required'),
-    contact: z.string().optional(),
     email: z.string().email('Invalid email address'),
     password: z.string().min(6, 'Password must be at least 6 characters'),
 });
@@ -39,8 +36,8 @@ export default function VendorSignupPage() {
             });
             // After successful signup, check auth to update context
             await checkAuth();
-            // Redirect to dashboard for vendors
-            router.push('/dashboard');
+            // Redirect to shop creation page for vendors
+            router.push('/dashboard/shop');
         } catch (err: any) {
             setError(err.response?.data?.message || 'Signup failed. Please try again.');
         }
@@ -112,70 +109,31 @@ export default function VendorSignupPage() {
                             <p className="text-sm text-slate-500 mt-1">Fill in your details to get started</p>
                         </div>
 
-                        <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-                            <div className="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label htmlFor="fullName" className="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
-                                    <input
-                                        id="fullName"
-                                        type="text"
-                                        required
-                                        className={`w-full px-3 py-2 text-sm border ${errors.fullName ? 'border-red-300' : 'border-slate-200'} rounded-xl focus:outline-none focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/20 transition-all`}
-                                        placeholder="John Doe"
-                                        {...register('fullName')}
-                                    />
-                                    {errors.fullName && <p className="mt-1 text-xs text-red-500">{errors.fullName.message}</p>}
-                                </div>
-                                <div>
-                                    <label htmlFor="shopName" className="block text-xs font-semibold text-slate-700 mb-1">Shop Name</label>
-                                    <input
-                                        id="shopName"
-                                        type="text"
-                                        required
-                                        className={`w-full px-3 py-2 text-sm border ${errors.shopName ? 'border-red-300' : 'border-slate-200'} rounded-xl focus:outline-none focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/20 transition-all`}
-                                        placeholder="My Shop"
-                                        {...register('shopName')}
-                                    />
-                                    {errors.shopName && <p className="mt-1 text-xs text-red-500">{errors.shopName.message}</p>}
-                                </div>
+                        <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+                            <div>
+                                <label htmlFor="fullName" className="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
+                                <input
+                                    id="fullName"
+                                    type="text"
+                                    required
+                                    className={`w-full px-3 py-2.5 text-sm border ${errors.fullName ? 'border-red-300' : 'border-slate-200'} rounded-xl focus:outline-none focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/20 transition-all`}
+                                    placeholder="John Doe"
+                                    {...register('fullName')}
+                                />
+                                {errors.fullName && <p className="mt-1 text-xs text-red-500">{errors.fullName.message}</p>}
                             </div>
 
                             <div>
-                                <label htmlFor="address" className="block text-xs font-semibold text-slate-700 mb-1">Shop Address</label>
+                                <label htmlFor="email-address" className="block text-xs font-semibold text-slate-700 mb-1">Email</label>
                                 <input
-                                    id="address"
-                                    type="text"
+                                    id="email-address"
+                                    type="email"
                                     required
-                                    className={`w-full px-3 py-2 text-sm border ${errors.address ? 'border-red-300' : 'border-slate-200'} rounded-xl focus:outline-none focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/20 transition-all`}
-                                    placeholder="123 Main St, City"
-                                    {...register('address')}
+                                    className={`w-full px-3 py-2.5 text-sm border ${errors.email ? 'border-red-300' : 'border-slate-200'} rounded-xl focus:outline-none focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/20 transition-all`}
+                                    placeholder="you@example.com"
+                                    {...register('email')}
                                 />
-                                {errors.address && <p className="mt-1 text-xs text-red-500">{errors.address.message}</p>}
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label htmlFor="contact" className="block text-xs font-semibold text-slate-700 mb-1">Contact (Optional)</label>
-                                    <input
-                                        id="contact"
-                                        type="text"
-                                        className="w-full px-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/20 transition-all"
-                                        placeholder="+1 234 567 890"
-                                        {...register('contact')}
-                                    />
-                                </div>
-                                <div>
-                                    <label htmlFor="email-address" className="block text-xs font-semibold text-slate-700 mb-1">Email</label>
-                                    <input
-                                        id="email-address"
-                                        type="email"
-                                        required
-                                        className={`w-full px-3 py-2 text-sm border ${errors.email ? 'border-red-300' : 'border-slate-200'} rounded-xl focus:outline-none focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/20 transition-all`}
-                                        placeholder="you@example.com"
-                                        {...register('email')}
-                                    />
-                                    {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>}
-                                </div>
+                                {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>}
                             </div>
 
                             <div>
@@ -184,11 +142,15 @@ export default function VendorSignupPage() {
                                     id="password"
                                     type="password"
                                     required
-                                    className={`w-full px-3 py-2 text-sm border ${errors.password ? 'border-red-300' : 'border-slate-200'} rounded-xl focus:outline-none focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/20 transition-all`}
+                                    className={`w-full px-3 py-2.5 text-sm border ${errors.password ? 'border-red-300' : 'border-slate-200'} rounded-xl focus:outline-none focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/20 transition-all`}
                                     placeholder="••••••••"
                                     {...register('password')}
                                 />
                                 {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password.message}</p>}
+                            </div>
+
+                            <div className="rounded-xl bg-indigo-50 p-3 border border-indigo-100">
+                                <p className="text-xs text-indigo-800">After signup, you'll be directed to create your shop profile with location and contact details.</p>
                             </div>
 
                             {error && (

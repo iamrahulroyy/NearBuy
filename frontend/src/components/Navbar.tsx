@@ -13,7 +13,7 @@ const Navbar = () => {
     const isVendorOrAdmin = user?.role === UserRole.VENDOR || user?.role === UserRole.ADMIN;
 
     return (
-        <nav className="bg-white sticky top-0 z-50 border-b border-gray-100">
+        <nav className="bg-white sticky top-0 z-50 border-b border-gray-100 pr-[6px]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
                     {/* Left Side: Logo + Browse */}
@@ -57,6 +57,12 @@ const Navbar = () => {
                         </a>
                         {isAuthenticated ? (
                             <div className="flex items-center gap-4">
+                                {isVendorOrAdmin && (
+                                    <Link href="/dashboard" className="flex items-center gap-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-sm font-medium px-4 py-2 rounded-full transition-all">
+                                        <ShoppingBag className="w-4 h-4" />
+                                        Dashboard
+                                    </Link>
+                                )}
                                 <div className="flex items-center gap-1 text-gray-700 text-sm font-medium cursor-pointer hover:text-black transition-colors">
                                     <span>{user?.fullName}</span>
                                     <ChevronDown className="w-4 h-4" />
@@ -108,9 +114,16 @@ const Navbar = () => {
                             About us
                         </Link>
                         {isAuthenticated ? (
-                            <button onClick={() => { logout(); setIsOpen(false); }} className="w-full text-left block px-3 py-2 text-base font-medium text-gray-700 hover:text-black hover:bg-gray-50 rounded-md">
-                                Logout
-                            </button>
+                            <>
+                                {isVendorOrAdmin && (
+                                    <Link href="/dashboard" onClick={() => setIsOpen(false)} className="block px-3 py-2 text-base font-medium text-indigo-600 bg-indigo-50 rounded-md">
+                                        Dashboard
+                                    </Link>
+                                )}
+                                <button onClick={() => { logout(); setIsOpen(false); }} className="w-full text-left block px-3 py-2 text-base font-medium text-gray-700 hover:text-black hover:bg-gray-50 rounded-md">
+                                    Logout
+                                </button>
+                            </>
                         ) : (
                             <>
                                 <Link href="/login" onClick={() => setIsOpen(false)} className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-black hover:bg-gray-50 rounded-md">
